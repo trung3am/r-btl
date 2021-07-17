@@ -1,3 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+#excel#
+##
+*.xlsx
 
-192_CO1007.xlsx

@@ -24,90 +24,58 @@ SoCDR <- nrow(LietKe)
 SoCDR
 LietKe
 
-#3-4 TINH 1 MADE DUY NHAT
-
-
-
-#GK
-
+#3-4
 
 TSGK<- as.data.frame(t(LOGK))
 TSGK<- TSGK[2:nrow(TSGK),]
 
-
-GTSKGK <- ggplot(TSGK, aes(x = V1)) + geom_histogram(bins = 35) + labs(x = "Learning Outcome",
-                                                          y = "Frequency")
 colnames(TSGK) <- c(1921:1924)
-GTSKGK
+
 tansuatGK<- data.frame(
-  LearningOutcome = c(11,12,21,22,23,31,32),
+  LearningOutcome = c("LO1", "LO2", "LO3"),
   Freq = c(
-    sum(TSGK[1] == 11),
-    sum(TSGK[1] == 12),
-    sum(TSGK[1] == 21),
-    sum(TSGK[1] == 22),
-    sum(TSGK[1] == 23),
-    sum(TSGK[1] == 31),
-    sum(TSGK[1] == 32)
+    sum(TSGK[1] <= 12),
+    sum(TSGK[1] <= 23  & TSGK[1] >= 21),
+    sum(TSGK[1] >= 31)
   )
 )
 #KQGK
 tansuatGK
+GTSKGK <-ggplot(tansuatGK, aes(x = ""  , 
+                               y = "Freq")) + geom_bar(stat = "identity"
+                               ) + coord_polar("y", start=0)
+
+GTSKGK<- ggplot(tansuatGK, aes(x="", y=Freq, fill=LearningOutcome)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0)
+
+GTSKGK
+
 
 TSCK<- as.data.frame(t(LOCK))
 TSCK<- TSCK[2:nrow(TSCK),]
 
-
-GTSCK <-ggplot(TSCK, aes(x = V1)) + geom_histogram(bins = 35) + labs(x = "Learning Outcome",
-                                                             y = "Frequency")
 colnames(TSCK) <- c(1921:1924)
-GTSCK
 
 tansuatCK<- data.frame(
-  LearningOutcome = c(11,12,21,22,23,31,32),
+  LearningOutcome = c("LO1", "LO2", "LO3"),
   Freq = c(
-    sum(TSCK[1] == 11),
-    sum(TSCK[1] == 12),
-    sum(TSCK[1] == 21),
-    sum(TSCK[1] == 22),
-    sum(TSCK[1] == 23),
-    sum(TSCK[1] == 31),
-    sum(TSCK[1] == 32)
+    sum(TSCK[1] <= 12),
+    sum(TSCK[1] <= 23  & TSCK[1] >= 21),
+    sum(TSCK[1] >= 31)
   )
 )
 #KQCK
 tansuatCK
+GTSKCK <-ggplot(tansuatCK, aes(x = ""  , 
+                               y = "Freq")) + geom_bar(stat = "identity"
+                               ) + coord_polar("y", start=0)
 
-#TINH CHUNG 4 MADE GOP LAI
-FQ11G <- sum(rowSums(LOGK[,c(2:26)] == 11),na.rm = T)
-FQ12G <- sum(rowSums(LOGK[,c(2:26)] == 12),na.rm = T)
-FQ21G <- sum(rowSums(LOGK[,c(2:26)] == 21),na.rm = T)
-FQ22G <- sum(rowSums(LOGK[,c(2:26)] == 22),na.rm = T)
-FQ23G <- sum(rowSums(LOGK[,c(2:26)] == 23),na.rm = T)
-FQ31G <- sum(rowSums(LOGK[,c(2:26)] == 31),na.rm = T)
-FQ32G <- sum(rowSums(LOGK[,c(2:26)] == 32),na.rm = T)
+GTSKCK<- ggplot(tansuatCK, aes(x="", y=Freq, fill=LearningOutcome)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0)
 
-TanSuatGK<- data.frame(
-  Lo = c(11,12,21,22,23,31,32),
-  F= c(FQ11G,FQ12G,FQ21G,FQ22G,FQ23G,FQ31G,FQ32G)
-)
-gtansuatgk <- ggplot(TanSuatGK) + geom_point(mapping = aes(x = Lo, y = F))
-gtansuatgk
-
-FQ11 <- sum(rowSums(LOCK[,c(2:26)] == 11),na.rm = T)
-FQ12 <- sum(rowSums(LOCK[,c(2:26)] == 12),na.rm = T)
-FQ21 <- sum(rowSums(LOCK[,c(2:26)] == 21),na.rm = T)
-FQ22 <- sum(rowSums(LOCK[,c(2:26)] == 22),na.rm = T)
-FQ23 <- sum(rowSums(LOCK[,c(2:26)] == 23),na.rm = T)
-FQ31 <- sum(rowSums(LOCK[,c(2:26)] == 31),na.rm = T)
-FQ32 <- sum(rowSums(LOCK[,c(2:26)] == 32),na.rm = T)
-
-TanSuatCK<- data.frame(
-  Lo = c(11,12,21,22,23,31,32),
-  F= c(FQ11,FQ12,FQ21,FQ22,FQ23,FQ31,FQ32)
-)
-gtansuatck <- ggplot(TanSuatCK) + geom_point(mapping = aes(x = Lo, y = F))
-gtansuatck
+GTSKCK
 
 
 
@@ -221,4 +189,51 @@ ggplot(DungLOCK) + geom_point(mapping = aes(x = LO, y = SUMTLD))
 
 
 # 
+
+#7 
+
+
+
+#TINH CHUNG 4 MADE GOP LAI  
+FQ11G <- sum(rowSums(LOGK[,c(2:26)] == 11),na.rm = T)
+FQ12G <- sum(rowSums(LOGK[,c(2:26)] == 12),na.rm = T)
+FQ21G <- sum(rowSums(LOGK[,c(2:26)] == 21),na.rm = T)
+FQ22G <- sum(rowSums(LOGK[,c(2:26)] == 22),na.rm = T)
+FQ23G <- sum(rowSums(LOGK[,c(2:26)] == 23),na.rm = T)
+FQ31G <- sum(rowSums(LOGK[,c(2:26)] == 31),na.rm = T)
+FQ32G <- sum(rowSums(LOGK[,c(2:26)] == 32),na.rm = T)
+
+TanSuatGK<- data.frame(
+  Lo = c(11,12,21,22,23,31,32),
+  F= c(FQ11G,FQ12G,FQ21G,FQ22G,FQ23G,FQ31G,FQ32G)
+)
+gtansuatgk <- ggplot(TanSuatGK) + geom_point(mapping = aes(x = Lo, y = F))
+gtansuatgk
+
+FQ11 <- sum(rowSums(LOCK[,c(2:26)] == 11),na.rm = T)
+FQ12 <- sum(rowSums(LOCK[,c(2:26)] == 12),na.rm = T)
+FQ21 <- sum(rowSums(LOCK[,c(2:26)] == 21),na.rm = T)
+FQ22 <- sum(rowSums(LOCK[,c(2:26)] == 22),na.rm = T)
+FQ23 <- sum(rowSums(LOCK[,c(2:26)] == 23),na.rm = T)
+FQ31 <- sum(rowSums(LOCK[,c(2:26)] == 31),na.rm = T)
+FQ32 <- sum(rowSums(LOCK[,c(2:26)] == 32),na.rm = T)
+
+TanSuatCK<- data.frame(
+  Lo = c(11,12,21,22,23,31,32),
+  F= c(FQ11,FQ12,FQ21,FQ22,FQ23,FQ31,FQ32)
+)
+gtansuatck <- ggplot(TanSuatCK) + geom_point(mapping = aes(x = Lo, y = F))
+gtansuatck
+
+TanSuatChung <- data.frame(
+  Lo = c(11,12,21,22,23,31,32),
+  F = TanSuatGK$F + TanSuatCK$F
+)
+TanSuatChung
+gtansuatchung <- ggplot(TanSuatChung) + 
+  geom_point(mapping = aes(x = Lo, y = F))
+
+gtansuatchung
+
+
 

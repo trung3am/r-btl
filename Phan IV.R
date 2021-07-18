@@ -226,23 +226,23 @@ LOR.GK31
 
 #Graph ---
 
-GLOR.GK11 <- plot2 <- ggplot(LOR.GK11, aes(x = as.character(LOR.GK11[,2]), y = LOR.GK11[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK11[,1]), vjust=-0.3, size=3.5, )+
+GLOR.GK11 <- ggplot(LOR.GK11, aes(x = as.character(LOR.GK11[,2]), y = LOR.GK11[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK11[,1]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 11", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
 
-GLOR.GK12 <- plot2 <- ggplot(LOR.GK12, aes(x = as.character(LOR.GK12[,2]), y = LOR.GK12[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK12[,1]), vjust=-0.3, size=3.5, )+
+GLOR.GK12 <-  ggplot(LOR.GK12, aes(x = as.character(LOR.GK12[,2]), y = LOR.GK12[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK12[,1]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 12", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
 
-GLOR.GK21 <- plot2 <- ggplot(LOR.GK21, aes(x = as.character(LOR.GK21[,2]), y = LOR.GK21[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK21[,1]), vjust=-0.3, size=3.5, )+
+GLOR.GK21 <- ggplot(LOR.GK21, aes(x = as.character(LOR.GK21[,2]), y = LOR.GK21[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK21[,1]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 21", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
 
-GLOR.GK22 <- plot2 <- ggplot(LOR.GK22, aes(x = as.character(LOR.GK22[,2]), y = LOR.GK22[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK22[,1]), vjust=-0.3, size=3.5, )+
+GLOR.GK22 <-  ggplot(LOR.GK22, aes(x = as.character(LOR.GK22[,2]), y = LOR.GK22[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK22[,1]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 22", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
 
-GLOR.GK31 <- plot2 <- ggplot(LOR.GK31, aes(x = as.character(LOR.GK31[,2]), y = LOR.GK31[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK31[,1]), vjust=-0.3, size=3.5, )+
+GLOR.GK31 <- ggplot(LOR.GK31, aes(x = as.character(LOR.GK31[,2]), y = LOR.GK31[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK31[,1]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 31", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
 
-GLOR.GKGK <-ggarrange(GLOR.GK11,GLOR.GK12,GLOR.GK21,GLOR.GK22,GLOR.GK31, ncol = 3, nrow = 2)
-
+GLOR.GK <-ggarrange(GLOR.GK11,GLOR.GK12,GLOR.GK21,GLOR.GK22,GLOR.GK31, ncol = 3, nrow = 2)
+GLOR.GK
 #Problem 6 ------
 #import data 
 
@@ -381,20 +381,30 @@ LOR.CK32$SoCauTLDung <- row.names(LOR.CK32)
 LOR.CK32
 
 #Graph ----
-GLOR.CK12 <- plot2 <- ggplot(LOR.CK12, aes(x = as.character(LOR.CK12[,2]), y = LOR.CK12[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK12[,1]), vjust=-0.3, size=3.5, )+
+GLOR.CK12 <-ggplot(LOR.CK12, aes(x = as.character(LOR.CK12[,2]), y = LOR.CK12[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK12[,1]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 12", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#57d5c5"))
 
-GLOR.CK23 <- plot2 <- ggplot(LOR.CK23, aes(x = as.character(LOR.CK23[,2]), y = LOR.CK23[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK23[,1]), vjust=-0.3, size=3.5, )+
+GLOR.CK23 <- ggplot(LOR.CK23, aes(x = as.character(LOR.CK23[,2]), y = LOR.CK23[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK23[,1]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 23", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#57d5c5"))
 
-GLOR.CK31 <- plot2 <- ggplot(LOR.CK31, aes(x = as.character(LOR.CK31[,2]), y = LOR.CK31[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK31[,1]), vjust=-0.3, size=3.5, )+
+GLOR.CK31 <-ggplot(LOR.CK31, aes(x = as.character(LOR.CK31[,2]), y = LOR.CK31[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK31[,1]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 31", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#57d5c5"))
 
-GLOR.CK32 <- plot2 <- ggplot(LOR.CK32, aes(x = as.character(LOR.CK32[,2]), y = LOR.CK32[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK32[,1]), vjust=-0.3, size=3.5, )+
+GLOR.CK32 <- ggplot(LOR.CK32, aes(x = as.character(LOR.CK32[,2]), y = LOR.CK32[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK32[,1]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 32", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#57d5c5"))
 
 GLOR.CK <-ggarrange(GLOR.CK12,GLOR.CK23,GLOR.CK31,GLOR.CK32, ncol = 3, nrow = 2)
-
+GLOR.CK
 
 #Problem 7 ----
+#Learning outcome mid term and final exam
+LO.data<- as.data.frame(bind_rows(table(GKCDR.1921),table(CKCDR.1921)))
+#Convert in to data for chart drawing
+LO.data[is.na(LO.data)] <- 0
+LO.data<- as.data.frame(apply(LO.data,2,sum))
+LO.data$LO <- row.names(LO.data)
 
+GLO.data <- ggplot(LO.data, aes(x = as.character(LO.data[,2]), y = LO.data[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LO.data[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Question per learning outcome", x = "Learning outcome", y = "Questions quantity") + theme(panel.background = element_rect(fill = "#57d5c5"))
+GLO.data
+#Problem 8 ----

@@ -181,8 +181,7 @@ LOR.GK11[is.na(LOR.GK11)] <- 0
 #Sum column
 LOR.GK11 <- as.data.frame(apply(LOR.GK11,2,sum))
 LOR.GK11$SoCauTLDung <- row.names(LOR.GK11)
-#deselect 0 right anwser row
-LOR.GK11<- LOR.GK11[LOR.GK11$SoCauTLDung > 0,] 
+
 #re order data
 LOR.GK11<- transform(LOR.GK11, SoCauTLDung = as.numeric(SoCauTLDung))
 LOR.GK11<- arrange(LOR.GK11,SoCauTLDung)
@@ -205,8 +204,6 @@ LOR.GK21[is.na(LOR.GK21)] <- 0
 LOR.GK21 <- as.data.frame(apply(LOR.GK21,2,sum))
 
 LOR.GK21$SoCauTLDung <- row.names(LOR.GK21)
-#deselect 0 right anwser row
-LOR.GK21<- LOR.GK21[LOR.GK21$SoCauTLDung > 0,] 
 
 
 #Learning outcome 22 (merge into usable data frame)
@@ -217,8 +214,6 @@ LOR.GK22[is.na(LOR.GK22)] <- 0
 LOR.GK22 <- as.data.frame(apply(LOR.GK22,2,sum))
 
 LOR.GK22$SoCauTLDung <- row.names(LOR.GK22)
-#deselect 0 right anwser row
-LOR.GK22<- LOR.GK22[LOR.GK22$SoCauTLDung > 0,] 
 
 
 #Learning outcome 31 (merge into usable data frame)
@@ -229,8 +224,6 @@ LOR.GK31[is.na(LOR.GK31)] <- 0
 LOR.GK31 <- as.data.frame(apply(LOR.GK31,2,sum))
 
 LOR.GK31$SoCauTLDung <- row.names(LOR.GK31)
-#deselect 0 right anwser row
-LOR.GK31<- LOR.GK31[LOR.GK31$SoCauTLDung > 0,] 
 
 
 #Graph ---
@@ -367,8 +360,7 @@ LOR.CK23 <- as.data.frame(apply(LOR.CK23,2,sum))
 LOR.CK23$SoCauTLDung <- row.names(LOR.CK23)
 LOR.CK23
 
-#deselect 0 right anwser row
-LOR.CK23<- LOR.CK23[LOR.CK23$SoCauTLDung > 0,] 
+
 
 
 #Learning outcome 31 (merge into usable data frame)
@@ -436,8 +428,7 @@ LOW.GK11 <- LOR.GK11
 LOW.GK11 <- transform(LOW.GK11, SoCauTLDung = as.numeric(SoCauTLDung))
 LOW.GK11$SoCauTLSai <- abs(LOW.GK11$SoCauTLDung - as.numeric(TotalQFrameGK[1,2]))
 LOW.GK11 <- LOW.GK11[,c(1,3)]
-#deselect 0
-LOW.GK11 <- LOW.GK11[LOW.GK11$SoCauTLSai > 0,]
+
 #percentaging
 LOW.GK11[,1] <- round(LOW.GK11[,1]/sum(LOW.GK11[,1]),3)
 LOW.GK11
@@ -446,8 +437,7 @@ LOW.GK12 <- LOR.GK12
 LOW.GK12 <- transform(LOW.GK12, SoCauTLDung = as.numeric(SoCauTLDung))
 LOW.GK12$SoCauTLSai <- abs(LOW.GK12$SoCauTLDung - as.numeric(TotalQFrameGK[2,2]))
 LOW.GK12 <- LOW.GK12[,c(1,3)]
-#deselect 0
-LOW.GK12 <- LOW.GK12[LOW.GK12$SoCauTLSai > 0,]
+
 #percentaging
 LOW.GK12[,1] <- round(LOW.GK12[,1]/sum(LOW.GK12[,1]),3)
 LOW.GK12
@@ -455,8 +445,7 @@ LOW.GK12
 LOW.GK21 <- LOR.GK21
 LOW.GK21 <- transform(LOW.GK21, SoCauTLDung = as.numeric(SoCauTLDung))
 LOW.GK21$SoCauTLSai <- abs(LOW.GK21$SoCauTLDung - as.numeric(TotalQFrameGK[3,2]))
-#deselect 0
-LOW.GK21 <- LOW.GK21[LOW.GK21$SoCauTLSai > 0,]
+
 LOW.GK21
 #percentaging
 LOW.GK21[,1] <- round(LOW.GK21[,1]/sum(LOW.GK21[,1]),3)
@@ -467,8 +456,7 @@ LOW.GK22 <- LOR.GK22
 LOW.GK22 <- transform(LOW.GK22, SoCauTLDung = as.numeric(SoCauTLDung))
 LOW.GK22$SoCauTLSai <- abs(LOW.GK22$SoCauTLDung - as.numeric(TotalQFrameGK[4,2]))
 LOW.GK22 <- LOW.GK22[,c(1,3)]
-#deselect 0
-LOW.GK22 <- LOW.GK22[LOW.GK22$SoCauTLSai > 0,]
+
 #percentaging
 LOW.GK22[,1] <- round(LOW.GK22[,1]/sum(LOW.GK22[,1]),3)
 LOW.GK22
@@ -477,8 +465,7 @@ LOW.GK31 <- LOR.GK31
 LOW.GK31 <- transform(LOW.GK31, SoCauTLDung = as.numeric(SoCauTLDung))
 LOW.GK31$SoCauTLSai <- abs(LOW.GK31$SoCauTLDung - as.numeric(TotalQFrameGK[5,2]))
 LOW.GK31 <- LOW.GK31[,c(1,3)]
-#deselect 0
-LOW.GK31 <- LOW.GK31[LOW.GK31$SoCauTLSai > 0,]
+
 #percentaging
 LOW.GK31[,1] <- round(LOW.GK31[,1]/sum(LOW.GK31[,1]),3)
 LOW.GK31
@@ -515,8 +502,7 @@ LOW.CK12 <- LOR.CK12
 LOW.CK12 <- transform(LOW.CK12, SoCauTLDung = as.numeric(SoCauTLDung))
 LOW.CK12$SoCauTLSai <- abs(LOW.CK12$SoCauTLDung - as.numeric(TotalQFrameCK[1,2]))
 LOW.CK12 <- LOW.CK12[,c(1,3)]
-#deselect 0
-LOW.CK12 <- LOW.CK12[LOW.CK12$SoCauTLSai > 0,]
+
 #percentaging
 LOW.CK12[,1] <- round(LOW.CK12[,1]/sum(LOW.CK12[,1]),3)
 LOW.CK12
@@ -525,8 +511,7 @@ LOW.CK23 <- LOR.CK23
 LOW.CK23 <- transform(LOW.CK23, SoCauTLDung = as.numeric(SoCauTLDung))
 LOW.CK23$SoCauTLSai <- abs(LOW.CK23$SoCauTLDung - as.numeric(TotalQFrameCK[2,2]))
 LOW.CK23 <- LOW.CK23[,c(1,3)]
-#deselect 0
-LOW.CK23 <- LOW.CK23[LOW.CK23$SoCauTLSai > 0,]
+
 #percentaging
 LOW.CK23[,1] <- round(LOW.CK23[,1]/sum(LOW.CK23[,1]),3)
 LOW.CK23
@@ -535,8 +520,7 @@ LOW.CK31 <- LOR.CK31
 LOW.CK31 <- transform(LOW.CK31, SoCauTLDung = as.numeric(SoCauTLDung))
 LOW.CK31$SoCauTLSai <- abs(LOW.CK31$SoCauTLDung - as.numeric(TotalQFrameCK[3,2]))
 LOW.CK31 <- LOW.CK31[,c(1,3)]
-#deselect 0
-LOW.CK31 <- LOW.CK31[LOW.CK31$SoCauTLSai > 0,]
+
 #percentaging
 LOW.CK31[,1] <- round(LOW.CK31[,1]/sum(LOW.CK31[,1]),3)
 LOW.CK31
@@ -545,8 +529,7 @@ LOW.CK32 <- LOR.CK32
 LOW.CK32 <- transform(LOW.CK32, SoCauTLDung = as.numeric(SoCauTLDung))
 LOW.CK32$SoCauTLSai <- abs(LOW.CK32$SoCauTLDung - as.numeric(TotalQFrameCK[4,2]))
 LOW.CK32 <- LOW.CK32[,c(1,3)]
-#deselect 0
-LOW.CK32 <- LOW.CK32[LOW.CK32$SoCauTLSai > 0,]
+
 #percentaging
 LOW.CK32[,1] <- round(LOW.CK32[,1]/sum(LOW.CK32[,1]),3)
 LOW.CK32
@@ -570,3 +553,5 @@ GLOW.CK <-ggarrange(GLOW.CK12,GLOW.CK23,GLOW.CK31,GLOW.CK32, ncol = 3, nrow = 2)
 GLOW.CK
 
 #Problem 10 ---
+
+

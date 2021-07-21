@@ -937,5 +937,95 @@ LOW23$percent <- round(LOW23[,1]/sum(LOW23[,1]),3)
 GLOW23 <- ggplot(LOW23, aes(x = as.character(LOW23[,2]), y = LOW23[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW23[,3]), vjust=-0.3, size=3.5, )+
   labs(title = "Learning Outcome 23", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
 
-GW <- ggarrange(GLOW.GK11, GLOW12, GLOW.GK21, GLOW.GK22, GLOW23, GLOW.CK31, GLOW.CK32, ncol=3, nrow = 3)
+#Learning outcome 31
+
+LO31.last5.1922 <- table(apply(last5.1922[-1,last5.1922[1,]==31],1,sum))
+LO31.last5.1923 <- table(apply(last5.1923[-1,last5.1923[1,]==31],1,sum))
+LO31.last5.1924 <- table(apply(last5.1924[-1,last5.1924[1,]==31],1,sum))
+
+rownames(LO31.last5.1922) <- abs(as.numeric(rownames(LO31.last5.1922)) - ncol(GKCDR[GKCDR[,1]==1922,GKCDR[2,] == 31]))
+rownames(LO31.last5.1923) <- abs(as.numeric(rownames(LO31.last5.1923)) - ncol(GKCDR[GKCDR[,1]==1923,GKCDR[2,] == 31]))
+rownames(LO31.last5.1924) <- abs(as.numeric(rownames(LO31.last5.1924)) - ncol(GKCDR[GKCDR[,1]==1924,GKCDR[2,] == 31]))
+
+
+LO31.Diem1921.1921 <- table(apply(Diem1921.1921[-1,Diem1921.1921[1,]==31],1,sum))
+LO31.Diem1921.1922 <- table(apply(Diem1921.1922[-1,Diem1921.1922[1,]==31],1,sum))
+LO31.Diem1921.1923 <- table(apply(Diem1921.1923[-1,Diem1921.1923[1,]==31],1,sum))
+LO31.Diem1921.1924 <- table(apply(Diem1921.1924[-1,Diem1921.1924[1,]==31],1,sum))
+LO31.Diem1922.1921 <- table(apply(Diem1922.1921[-1,Diem1922.1921[1,]==31],1,sum))
+LO31.Diem1922.1922 <- table(apply(Diem1922.1922[-1,Diem1922.1922[1,]==31],1,sum))
+LO31.Diem1922.1923 <- table(apply(Diem1922.1923[-1,Diem1922.1923[1,]==31],1,sum))
+LO31.Diem1922.1924 <- table(apply(Diem1922.1924[-1,Diem1922.1924[1,]==31],1,sum))
+LO31.Diem1923.1921 <- table(apply(Diem1923.1921[-1,Diem1923.1921[1,]==31],1,sum))
+LO31.Diem1923.1922 <- table(apply(Diem1923.1922[-1,Diem1923.1922[1,]==31],1,sum))
+LO31.Diem1923.1923 <- table(apply(Diem1923.1923[-1,Diem1923.1923[1,]==31],1,sum))
+LO31.Diem1923.1924 <- table(apply(Diem1923.1924[-1,Diem1923.1924[1,]==31],1,sum))
+LO31.Diem1924.1921 <- table(apply(Diem1924.1921[-1,Diem1924.1921[1,]==31],1,sum))
+LO31.Diem1924.1922 <- table(apply(Diem1924.1922[-1,Diem1924.1922[1,]==31],1,sum))
+LO31.Diem1924.1923 <- table(apply(Diem1924.1923[-1,Diem1924.1923[1,]==31],1,sum))
+LO31.Diem1924.1924 <- table(apply(Diem1924.1924[-1,Diem1924.1924[1,]==31],1,sum))
+
+#make count right answer -> wrong answer
+rownames(LO31.Diem1921.1921) <- abs(as.numeric(rownames(LO31.Diem1921.1921)) - ncol(MD1921.1921[,MD1921.1921[1,]==31]))
+rownames(LO31.Diem1921.1922) <- abs(as.numeric(rownames(LO31.Diem1921.1922)) - ncol(MD1921.1922[,MD1921.1922[1,]==31]))
+rownames(LO31.Diem1921.1923) <- abs(as.numeric(rownames(LO31.Diem1921.1923)) - ncol(MD1921.1923[,MD1921.1923[1,]==31]))
+rownames(LO31.Diem1921.1924) <- abs(as.numeric(rownames(LO31.Diem1921.1924)) - ncol(MD1921.1924[,MD1921.1924[1,]==31]))
+
+rownames(LO31.Diem1922.1921) <- abs(as.numeric(rownames(LO31.Diem1922.1921)) - ncol(MD1922.1921[,MD1922.1921[1,]==31]))
+rownames(LO31.Diem1922.1922) <- abs(as.numeric(rownames(LO31.Diem1922.1922)) - ncol(MD1922.1922[,MD1922.1922[1,]==31]))
+rownames(LO31.Diem1922.1923) <- abs(as.numeric(rownames(LO31.Diem1922.1923)) - ncol(MD1922.1923[,MD1922.1923[1,]==31]))
+rownames(LO31.Diem1922.1924) <- abs(as.numeric(rownames(LO31.Diem1922.1924)) - ncol(MD1922.1924[,MD1922.1924[1,]==31]))
+
+
+#-----------------
+
+rownames(LO31.Diem1923.1921) <- abs(as.numeric(rownames(LO31.Diem1923.1921)) - ncol(MD1923.1921[,MD1923.1921[1,]==31]))
+rownames(LO31.Diem1923.1922) <- abs(as.numeric(rownames(LO31.Diem1923.1922)) - ncol(MD1923.1922[,MD1923.1922[1,]==31]))
+rownames(LO31.Diem1923.1923) <- abs(as.numeric(rownames(LO31.Diem1923.1923)) - ncol(MD1923.1923[,MD1923.1923[1,]==31]))
+rownames(LO31.Diem1923.1924) <- abs(as.numeric(rownames(LO31.Diem1923.1924)) - ncol(MD1923.1924[,MD1923.1924[1,]==31]))
+rownames(LO31.Diem1924.1921) <- abs(as.numeric(rownames(LO31.Diem1924.1921)) - ncol(MD1924.1921[,MD1924.1921[1,]==31]))
+rownames(LO31.Diem1924.1922) <- abs(as.numeric(rownames(LO31.Diem1924.1922)) - ncol(MD1924.1922[,MD1924.1922[1,]==31]))
+rownames(LO31.Diem1924.1923) <- abs(as.numeric(rownames(LO31.Diem1924.1923)) - ncol(MD1924.1923[,MD1924.1923[1,]==31]))
+rownames(LO31.Diem1924.1924) <- abs(as.numeric(rownames(LO31.Diem1924.1924)) - ncol(MD1924.1924[,MD1924.1924[1,]==31]))
+
+
+
+
+LOW31 <- as.data.frame(bind_rows(LO31.Diem1921.1921,
+                                 LO31.Diem1921.1922,
+                                 LO31.Diem1921.1923,
+                                 LO31.Diem1921.1924,
+                                 LO31.Diem1922.1921,
+                                 LO31.Diem1922.1922,
+                                 LO31.Diem1922.1923,
+                                 LO31.Diem1922.1924,
+                                 LO31.Diem1923.1921,
+                                 LO31.Diem1923.1922,
+                                 LO31.Diem1923.1923,
+                                 LO31.Diem1923.1924,
+                                 LO31.Diem1924.1921,
+                                 LO31.Diem1924.1922,
+                                 LO31.Diem1924.1923,
+                                 LO31.Diem1924.1924,
+                                 LO31.last5.1922,
+                                 LO31.last5.1923,
+                                 LO31.last5.1924
+))
+
+LOW31[is.na(LOW31)] <- 0
+
+LOW31 <- as.data.frame(apply(LOW31,2,sum))
+LOW31$SoCauTLSai <- as.numeric(row.names(LOW31))
+
+LOW31$percent <- round(LOW31[,1]/sum(LOW31[,1]),3)
+
+#graph----
+
+GLOW31 <- ggplot(LOW31, aes(x = as.character(LOW31[,2]), y = LOW31[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW31[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 31", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+
+
+
+GW <- ggarrange(GLOW.GK11, GLOW12, GLOW.GK21, GLOW.GK22, GLOW23, GLOW31, GLOW.CK32, ncol=3, nrow = 3)
 GW

@@ -514,7 +514,7 @@ LOW.GK12[is.na(LOW.GK12)] <- 0
 as.numeric(row.names(DiemGK.1921.LO12)) -1
 LOW.GK12<-as.data.frame(apply(LOW.GK12,2,sum))
 LOW.GK12
-LOW.GK12$SoCauTLSai <- abs(as.numeric(row.names(LOW.GK12)) - 12)
+LOW.GK12$SoCauTLSai <- abs(as.numeric(row.names(LOW.GK12)))
 LOW.GK12$percent <- round(LOW.GK12[,1]/sum(LOW.GK12[,1]),3)
 LOW.GK12
 
@@ -652,10 +652,10 @@ GLOW.CK
 
 #Problem 10 ---
 
-names(table(CKCDR.1921))
-names(table(GKCDR.1921))
-LoListCK <- data.frame(LO= names(table(CKCDR.1921)))
-LoListGK <- data.frame(LO= names(table(GKCDR.1921)))
+names(table(CKCDR.1922))
+names(table(GKCDR.1922))
+LoListCK <- data.frame(LO= names(table(CKCDR.1922)))
+LoListGK <- data.frame(LO= names(table(GKCDR.1922)))
 LoAp<-as.data.frame(table(rbind(LoListCK,LoListGK)))
 
 #Lo appeared in both midterm and final

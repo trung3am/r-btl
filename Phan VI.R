@@ -1,0 +1,494 @@
+library(xlsx)
+library(ggplot2)
+library(dplyr)
+library(ggpubr)
+library(tibble)
+
+
+#Problem 2------------------
+
+names(table(GKCDR.1922))
+
+names(table(CKCDR.1922))
+
+#Learning outcome that appeared in both mid/final exam is 12,23,31
+#Learning outcome 23 is accounted for md 1922 midterm
+
+TotalQFrameGKEX
+t(TotalQFrameCK)
+
+
+GLOW12
+GLOW23
+GLOW31
+
+#learning outcome 12 has 19-20 questions in both exam according to chart we 
+#see that students has one wrong answer is our target
+
+#learning outcome 23 has 3 questions in both exam according to chart we 
+#see that there is no student have right answer for all 3 questions
+#our target is in made 1922 midterm with one right answer and one right answer in final
+
+#learning outcome 31 has 9 questions in both exam according to chart we 
+#see that students has no wrong answer is our target
+
+#set param p to 1
+p<-1
+
+
+#---------------------------------------------------------------
+
+#reuse DiemGK & DiemCK
+
+DiemGKCK.2<- cbind( DiemGK[1:361,],DiemCK)
+
+#add combined made
+DiemGKCK.2$mdCK_GK <- as.numeric(paste(DiemGKCK.2[,29] ,DiemGKCK.2[,62], sep = ""))
+#rearrange
+DiemGKCK.2 <- DiemGKCK.2[,c(63,1:28, 33:61)]
+
+colnames(DiemGKCK.2)[c(5:29)] <- c(1:25)
+colnames(DiemGKCK.2)[c(30:58)] <- c(26:54)
+
+Diem2.1921.1921 <- apply(bind_rows(MD1921.1921,DiemGKCK.2[DiemGKCK.2[1] == 19211921,c(2,5:58)]),2,as.numeric)
+Diem2.1921.1922 <- apply(bind_rows(MD1921.1922,DiemGKCK.2[DiemGKCK.2[1] == 19211922,c(2,5:58)]),2,as.numeric)
+Diem2.1921.1923 <- apply(bind_rows(MD1921.1923,DiemGKCK.2[DiemGKCK.2[1] == 19211923,c(2,5:58)]),2,as.numeric)
+Diem2.1921.1924 <- apply(bind_rows(MD1921.1924,DiemGKCK.2[DiemGKCK.2[1] == 19211924,c(2,5:58)]),2,as.numeric)
+Diem2.1922.1921 <- apply(bind_rows(MD1922.1921,DiemGKCK.2[DiemGKCK.2[1] == 19221921,c(2,5:58)]),2,as.numeric)
+Diem2.1922.1922 <- apply(bind_rows(MD1922.1922,DiemGKCK.2[DiemGKCK.2[1] == 19221922,c(2,5:58)]),2,as.numeric)
+Diem2.1922.1923 <- apply(bind_rows(MD1922.1923,DiemGKCK.2[DiemGKCK.2[1] == 19221923,c(2,5:58)]),2,as.numeric)
+Diem2.1922.1924 <- apply(bind_rows(MD1922.1924,DiemGKCK.2[DiemGKCK.2[1] == 19221924,c(2,5:58)]),2,as.numeric)
+Diem2.1923.1921 <- apply(bind_rows(MD1923.1921,DiemGKCK.2[DiemGKCK.2[1] == 19231921,c(2,5:58)]),2,as.numeric)
+Diem2.1923.1922 <- apply(bind_rows(MD1923.1922,DiemGKCK.2[DiemGKCK.2[1] == 19231922,c(2,5:58)]),2,as.numeric)
+Diem2.1923.1923 <- apply(bind_rows(MD1923.1923,DiemGKCK.2[DiemGKCK.2[1] == 19231923,c(2,5:58)]),2,as.numeric)
+Diem2.1923.1924 <- apply(bind_rows(MD1923.1924,DiemGKCK.2[DiemGKCK.2[1] == 19231924,c(2,5:58)]),2,as.numeric)
+Diem2.1924.1921 <- apply(bind_rows(MD1924.1921,DiemGKCK.2[DiemGKCK.2[1] == 19241921,c(2,5:58)]),2,as.numeric)
+Diem2.1924.1922 <- apply(bind_rows(MD1924.1922,DiemGKCK.2[DiemGKCK.2[1] == 19241922,c(2,5:58)]),2,as.numeric)
+Diem2.1924.1923 <- apply(bind_rows(MD1924.1923,DiemGKCK.2[DiemGKCK.2[1] == 19241923,c(2,5:58)]),2,as.numeric)
+Diem2.1924.1924 <- apply(bind_rows(MD1924.1924,DiemGKCK.2[DiemGKCK.2[1] == 19241924,c(2,5:58)]),2,as.numeric)
+
+Diem2.LO12.1921.1921 <- as.data.frame(Diem2.1921.1921[,Diem2.1921.1921[1,] == 12 | is.na(Diem2.1921.1921[1,])]) 
+Diem2.LO12.1921.1922 <- as.data.frame(Diem2.1921.1922[,Diem2.1921.1922[1,] == 12 | is.na(Diem2.1921.1922[1,])]) 
+Diem2.LO12.1921.1923 <- as.data.frame(Diem2.1921.1923[,Diem2.1921.1923[1,] == 12 | is.na(Diem2.1921.1923[1,])]) 
+Diem2.LO12.1921.1924 <- as.data.frame(Diem2.1921.1924[,Diem2.1921.1924[1,] == 12 | is.na(Diem2.1921.1924[1,])]) 
+Diem2.LO12.1922.1921 <- as.data.frame(Diem2.1922.1921[,Diem2.1922.1921[1,] == 12 | is.na(Diem2.1922.1921[1,])]) 
+Diem2.LO12.1922.1922 <- as.data.frame(Diem2.1922.1922[,Diem2.1922.1922[1,] == 12 | is.na(Diem2.1922.1922[1,])]) 
+Diem2.LO12.1922.1923 <- as.data.frame(Diem2.1922.1923[,Diem2.1922.1923[1,] == 12 | is.na(Diem2.1922.1923[1,])]) 
+Diem2.LO12.1922.1924 <- as.data.frame(Diem2.1922.1924[,Diem2.1922.1924[1,] == 12 | is.na(Diem2.1922.1924[1,])]) 
+Diem2.LO12.1923.1921 <- as.data.frame(Diem2.1923.1921[,Diem2.1923.1921[1,] == 12 | is.na(Diem2.1923.1921[1,])]) 
+Diem2.LO12.1923.1922 <- as.data.frame(Diem2.1923.1922[,Diem2.1923.1922[1,] == 12 | is.na(Diem2.1923.1922[1,])]) 
+Diem2.LO12.1923.1923 <- as.data.frame(Diem2.1923.1923[,Diem2.1923.1923[1,] == 12 | is.na(Diem2.1923.1923[1,])]) 
+Diem2.LO12.1923.1924 <- as.data.frame(Diem2.1923.1924[,Diem2.1923.1924[1,] == 12 | is.na(Diem2.1923.1924[1,])]) 
+Diem2.LO12.1924.1921 <- as.data.frame(Diem2.1924.1921[,Diem2.1924.1921[1,] == 12 | is.na(Diem2.1924.1921[1,])]) 
+Diem2.LO12.1924.1922 <- as.data.frame(Diem2.1924.1922[,Diem2.1924.1922[1,] == 12 | is.na(Diem2.1924.1922[1,])]) 
+Diem2.LO12.1924.1923 <- as.data.frame(Diem2.1924.1923[,Diem2.1924.1923[1,] == 12 | is.na(Diem2.1924.1923[1,])]) 
+Diem2.LO12.1924.1924 <- as.data.frame(Diem2.1924.1924[,Diem2.1924.1924[1,] == 12 | is.na(Diem2.1924.1924[1,])]) 
+
+
+
+Diem2.LO12.1921.1921$TLD<- apply(Diem2.LO12.1921.1921[,c(1:ncol(MD1921.1921[,MD1921.1921 == 12]))],1,sum)
+Diem2.LO12.1921.1921[Diem2.LO12.1921.1921[-1,"TLD"] >= ncol(MD1921.1921[,MD1921.1921 == 12]) - p,"NO"]
+
+Diem2.LO12.1921.1921$TLD <- apply(Diem2.LO12.1921.1921[,c(1:ncol(MD1921.1921[,MD1921.1921 == 12]))],1,sum) 
+Diem2.LO12.1921.1922$TLD <- apply(Diem2.LO12.1921.1922[,c(1:ncol(MD1921.1922[,MD1921.1922 == 12]))],1,sum) 
+Diem2.LO12.1921.1923$TLD <- apply(Diem2.LO12.1921.1923[,c(1:ncol(MD1921.1923[,MD1921.1923 == 12]))],1,sum) 
+Diem2.LO12.1921.1924$TLD <- apply(Diem2.LO12.1921.1924[,c(1:ncol(MD1921.1924[,MD1921.1924 == 12]))],1,sum) 
+Diem2.LO12.1922.1921$TLD <- apply(Diem2.LO12.1922.1921[,c(1:ncol(MD1922.1921[,MD1922.1921 == 12]))],1,sum) 
+Diem2.LO12.1922.1922$TLD <- apply(Diem2.LO12.1922.1922[,c(1:ncol(MD1922.1922[,MD1922.1922 == 12]))],1,sum) 
+Diem2.LO12.1922.1923$TLD <- apply(Diem2.LO12.1922.1923[,c(1:ncol(MD1922.1923[,MD1922.1923 == 12]))],1,sum) 
+Diem2.LO12.1922.1924$TLD <- apply(Diem2.LO12.1922.1924[,c(1:ncol(MD1922.1924[,MD1922.1924 == 12]))],1,sum) 
+Diem2.LO12.1923.1921$TLD <- apply(Diem2.LO12.1923.1921[,c(1:ncol(MD1923.1921[,MD1923.1921 == 12]))],1,sum) 
+Diem2.LO12.1923.1922$TLD <- apply(Diem2.LO12.1923.1922[,c(1:ncol(MD1923.1922[,MD1923.1922 == 12]))],1,sum) 
+Diem2.LO12.1923.1923$TLD <- apply(Diem2.LO12.1923.1923[,c(1:ncol(MD1923.1923[,MD1923.1923 == 12]))],1,sum) 
+Diem2.LO12.1923.1924$TLD <- apply(Diem2.LO12.1923.1924[,c(1:ncol(MD1923.1924[,MD1923.1924 == 12]))],1,sum) 
+Diem2.LO12.1924.1921$TLD <- apply(Diem2.LO12.1924.1921[,c(1:ncol(MD1924.1921[,MD1924.1921 == 12]))],1,sum) 
+Diem2.LO12.1924.1922$TLD <- apply(Diem2.LO12.1924.1922[,c(1:ncol(MD1924.1922[,MD1924.1922 == 12]))],1,sum) 
+Diem2.LO12.1924.1923$TLD <- apply(Diem2.LO12.1924.1923[,c(1:ncol(MD1924.1923[,MD1924.1923 == 12]))],1,sum) 
+Diem2.LO12.1924.1924$TLD <- apply(Diem2.LO12.1924.1924[,c(1:ncol(MD1924.1924[,MD1924.1924 == 12]))],1,sum) 
+
+
+#list of student meets learning outcome 12 result requirement
+LO12SVList <- ("SV")
+
+LO12SVList <- c(LO12SVList,Diem2.LO12.1921.1921[Diem2.LO12.1921.1921[,"TLD"] >= ncol(MD1921.1921[,MD1921.1921 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1921.1922[Diem2.LO12.1921.1922[,"TLD"] >= ncol(MD1921.1922[,MD1921.1922 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1921.1923[Diem2.LO12.1921.1923[,"TLD"] >= ncol(MD1921.1923[,MD1921.1923 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1921.1924[Diem2.LO12.1921.1924[,"TLD"] >= ncol(MD1921.1924[,MD1921.1924 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1922.1921[Diem2.LO12.1922.1921[,"TLD"] >= ncol(MD1922.1921[,MD1922.1921 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1922.1922[Diem2.LO12.1922.1922[,"TLD"] >= ncol(MD1922.1922[,MD1922.1922 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1922.1923[Diem2.LO12.1922.1923[,"TLD"] >= ncol(MD1922.1923[,MD1922.1923 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1922.1924[Diem2.LO12.1922.1924[,"TLD"] >= ncol(MD1922.1924[,MD1922.1924 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1923.1921[Diem2.LO12.1923.1921[,"TLD"] >= ncol(MD1923.1921[,MD1923.1921 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1923.1922[Diem2.LO12.1923.1922[,"TLD"] >= ncol(MD1923.1922[,MD1923.1922 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1923.1923[Diem2.LO12.1923.1923[,"TLD"] >= ncol(MD1923.1923[,MD1923.1923 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1923.1924[Diem2.LO12.1923.1924[,"TLD"] >= ncol(MD1923.1924[,MD1923.1924 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1924.1921[Diem2.LO12.1924.1921[,"TLD"] >= ncol(MD1924.1921[,MD1924.1921 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1924.1922[Diem2.LO12.1924.1922[,"TLD"] >= ncol(MD1924.1922[,MD1924.1922 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1924.1923[Diem2.LO12.1924.1923[,"TLD"] >= ncol(MD1924.1923[,MD1924.1923 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1924.1924[Diem2.LO12.1924.1924[,"TLD"] >= ncol(MD1924.1924[,MD1924.1924 == 12]) - p,"No" ])  
+
+
+
+
+#list of student meets learning outcome 12 result requirement
+LO12SVList
+na.omit(as.data.frame(LO12SVList))
+
+
+Diem2.LO31.1921.1921 <- as.data.frame(Diem2.1921.1921[,Diem2.1921.1921[1,] == 31 | is.na(Diem2.1921.1921[1,])]) 
+Diem2.LO31.1921.1922 <- as.data.frame(Diem2.1921.1922[,Diem2.1921.1922[1,] == 31 | is.na(Diem2.1921.1922[1,])]) 
+Diem2.LO31.1921.1923 <- as.data.frame(Diem2.1921.1923[,Diem2.1921.1923[1,] == 31 | is.na(Diem2.1921.1923[1,])]) 
+Diem2.LO31.1921.1924 <- as.data.frame(Diem2.1921.1924[,Diem2.1921.1924[1,] == 31 | is.na(Diem2.1921.1924[1,])]) 
+Diem2.LO31.1922.1921 <- as.data.frame(Diem2.1922.1921[,Diem2.1922.1921[1,] == 31 | is.na(Diem2.1922.1921[1,])]) 
+Diem2.LO31.1922.1922 <- as.data.frame(Diem2.1922.1922[,Diem2.1922.1922[1,] == 31 | is.na(Diem2.1922.1922[1,])]) 
+Diem2.LO31.1922.1923 <- as.data.frame(Diem2.1922.1923[,Diem2.1922.1923[1,] == 31 | is.na(Diem2.1922.1923[1,])]) 
+Diem2.LO31.1922.1924 <- as.data.frame(Diem2.1922.1924[,Diem2.1922.1924[1,] == 31 | is.na(Diem2.1922.1924[1,])]) 
+Diem2.LO31.1923.1921 <- as.data.frame(Diem2.1923.1921[,Diem2.1923.1921[1,] == 31 | is.na(Diem2.1923.1921[1,])]) 
+Diem2.LO31.1923.1922 <- as.data.frame(Diem2.1923.1922[,Diem2.1923.1922[1,] == 31 | is.na(Diem2.1923.1922[1,])]) 
+Diem2.LO31.1923.1923 <- as.data.frame(Diem2.1923.1923[,Diem2.1923.1923[1,] == 31 | is.na(Diem2.1923.1923[1,])]) 
+Diem2.LO31.1923.1924 <- as.data.frame(Diem2.1923.1924[,Diem2.1923.1924[1,] == 31 | is.na(Diem2.1923.1924[1,])]) 
+Diem2.LO31.1924.1921 <- as.data.frame(Diem2.1924.1921[,Diem2.1924.1921[1,] == 31 | is.na(Diem2.1924.1921[1,])]) 
+Diem2.LO31.1924.1922 <- as.data.frame(Diem2.1924.1922[,Diem2.1924.1922[1,] == 31 | is.na(Diem2.1924.1922[1,])]) 
+Diem2.LO31.1924.1923 <- as.data.frame(Diem2.1924.1923[,Diem2.1924.1923[1,] == 31 | is.na(Diem2.1924.1923[1,])]) 
+Diem2.LO31.1924.1924 <- as.data.frame(Diem2.1924.1924[,Diem2.1924.1924[1,] == 31 | is.na(Diem2.1924.1924[1,])]) 
+
+
+
+Diem2.LO31.1921.1921$TLD<- apply(Diem2.LO31.1921.1921[,c(1:ncol(MD1921.1921[,MD1921.1921 == 31]))],1,sum)
+Diem2.LO31.1921.1921[Diem2.LO31.1921.1921[-1,"TLD"] >= ncol(MD1921.1921[,MD1921.1921 == 31]) - p,"NO"]
+
+Diem2.LO31.1921.1921$TLD <- apply(Diem2.LO31.1921.1921[,c(1:ncol(MD1921.1921[,MD1921.1921 == 31]))],1,sum) 
+Diem2.LO31.1921.1922$TLD <- apply(Diem2.LO31.1921.1922[,c(1:ncol(MD1921.1922[,MD1921.1922 == 31]))],1,sum) 
+Diem2.LO31.1921.1923$TLD <- apply(Diem2.LO31.1921.1923[,c(1:ncol(MD1921.1923[,MD1921.1923 == 31]))],1,sum) 
+Diem2.LO31.1921.1924$TLD <- apply(Diem2.LO31.1921.1924[,c(1:ncol(MD1921.1924[,MD1921.1924 == 31]))],1,sum) 
+Diem2.LO31.1922.1921$TLD <- apply(Diem2.LO31.1922.1921[,c(1:ncol(MD1922.1921[,MD1922.1921 == 31]))],1,sum) 
+Diem2.LO31.1922.1922$TLD <- apply(Diem2.LO31.1922.1922[,c(1:ncol(MD1922.1922[,MD1922.1922 == 31]))],1,sum) 
+Diem2.LO31.1922.1923$TLD <- apply(Diem2.LO31.1922.1923[,c(1:ncol(MD1922.1923[,MD1922.1923 == 31]))],1,sum) 
+Diem2.LO31.1922.1924$TLD <- apply(Diem2.LO31.1922.1924[,c(1:ncol(MD1922.1924[,MD1922.1924 == 31]))],1,sum) 
+Diem2.LO31.1923.1921$TLD <- apply(Diem2.LO31.1923.1921[,c(1:ncol(MD1923.1921[,MD1923.1921 == 31]))],1,sum) 
+Diem2.LO31.1923.1922$TLD <- apply(Diem2.LO31.1923.1922[,c(1:ncol(MD1923.1922[,MD1923.1922 == 31]))],1,sum) 
+Diem2.LO31.1923.1923$TLD <- apply(Diem2.LO31.1923.1923[,c(1:ncol(MD1923.1923[,MD1923.1923 == 31]))],1,sum) 
+Diem2.LO31.1923.1924$TLD <- apply(Diem2.LO31.1923.1924[,c(1:ncol(MD1923.1924[,MD1923.1924 == 31]))],1,sum) 
+Diem2.LO31.1924.1921$TLD <- apply(Diem2.LO31.1924.1921[,c(1:ncol(MD1924.1921[,MD1924.1921 == 31]))],1,sum) 
+Diem2.LO31.1924.1922$TLD <- apply(Diem2.LO31.1924.1922[,c(1:ncol(MD1924.1922[,MD1924.1922 == 31]))],1,sum) 
+Diem2.LO31.1924.1923$TLD <- apply(Diem2.LO31.1924.1923[,c(1:ncol(MD1924.1923[,MD1924.1923 == 31]))],1,sum) 
+Diem2.LO31.1924.1924$TLD <- apply(Diem2.LO31.1924.1924[,c(1:ncol(MD1924.1924[,MD1924.1924 == 31]))],1,sum) 
+
+
+#list of student meets learning outcome 31 result requirement
+LO31SVList <- "SV"
+
+LO31SVList <- c(LO31SVList,Diem2.LO31.1921.1921[Diem2.LO31.1921.1921[,"TLD"] >= ncol(MD1921.1921[,MD1921.1921 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1921.1922[Diem2.LO31.1921.1922[,"TLD"] >= ncol(MD1921.1922[,MD1921.1922 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1921.1923[Diem2.LO31.1921.1923[,"TLD"] >= ncol(MD1921.1923[,MD1921.1923 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1921.1924[Diem2.LO31.1921.1924[,"TLD"] >= ncol(MD1921.1924[,MD1921.1924 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1922.1921[Diem2.LO31.1922.1921[,"TLD"] >= ncol(MD1922.1921[,MD1922.1921 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1922.1922[Diem2.LO31.1922.1922[,"TLD"] >= ncol(MD1922.1922[,MD1922.1922 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1922.1923[Diem2.LO31.1922.1923[,"TLD"] >= ncol(MD1922.1923[,MD1922.1923 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1922.1924[Diem2.LO31.1922.1924[,"TLD"] >= ncol(MD1922.1924[,MD1922.1924 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1923.1921[Diem2.LO31.1923.1921[,"TLD"] >= ncol(MD1923.1921[,MD1923.1921 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1923.1922[Diem2.LO31.1923.1922[,"TLD"] >= ncol(MD1923.1922[,MD1923.1922 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1923.1923[Diem2.LO31.1923.1923[,"TLD"] >= ncol(MD1923.1923[,MD1923.1923 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1923.1924[Diem2.LO31.1923.1924[,"TLD"] >= ncol(MD1923.1924[,MD1923.1924 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1924.1921[Diem2.LO31.1924.1921[,"TLD"] >= ncol(MD1924.1921[,MD1924.1921 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1924.1922[Diem2.LO31.1924.1922[,"TLD"] >= ncol(MD1924.1922[,MD1924.1922 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1924.1923[Diem2.LO31.1924.1923[,"TLD"] >= ncol(MD1924.1923[,MD1924.1923 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1924.1924[Diem2.LO31.1924.1924[,"TLD"] >= ncol(MD1924.1924[,MD1924.1924 == 31]) - p,"No" ])  
+
+
+#list of student meets learning outcome 31 result requirement
+LO31SVList
+na.omit(as.data.frame(LO31SVList))
+
+
+
+#Learning outcome 23 handling exception data of midterm MD1922
+#Learning outcome 23 only have 1 question in midterm (MD1922) and 2 in final
+TotalQFrameGKEX
+#majority of students have right answer for Lo23MD1922 midterm
+DiemGK.1922.LO23
+#No student have 3 right answer for total Learning outcome 23(mid/final).
+LOW23
+
+#a conclusion : ----???---
+
+#Problem 3------------------------
+# IDK
+# 
+GKMN<- DiemGKCK.2[,c(3,5:29)]
+Nhom1<-GKMN[GKMN[,1] == "L01",]
+Nhom2<-GKMN[GKMN[,1] == "L02",]
+Nhom3<-GKMN[GKMN[,1] == "L03",]
+Nhom1$TongDiem <-round(rowSums(apply(Nhom1[,c(2:26)],2,as.numeric))/25*10,1)
+#average of each Nhom
+mean(round(rowSums(apply(Nhom1[,c(2:26)],2,as.numeric))/25*10,1))
+mean(round(rowSums(apply(Nhom2[,c(2:26)],2,as.numeric))/25*10,1))
+mean(round(rowSums(apply(Nhom3[,c(2:26)],2,as.numeric))/25*10,1))
+#median of each Nhom
+median(round(rowSums(apply(Nhom1[,c(2:26)],2,as.numeric))/25*10,1))
+median(round(rowSums(apply(Nhom2[,c(2:26)],2,as.numeric))/25*10,1))
+median(round(rowSums(apply(Nhom3[,c(2:26)],2,as.numeric))/25*10,1))
+
+#Frequency of each Nhom according to Diem
+
+FNhom1 <-as.data.frame(table(round(rowSums(apply(Nhom1[,c(2:26)],2,as.numeric))/25*10,1)))
+colnames(FNhom1) <- c("Diem", "Percentage")
+FNhom1$Percentage <- round(FNhom1$Percentage/sum(FNhom1$Percentage)*100,2)
+
+FNhom2 <-as.data.frame(table(round(rowSums(apply(Nhom2[,c(2:26)],2,as.numeric))/25*10,1)))
+colnames(FNhom2) <- c("Diem", "Sinh Vien")
+FNhom2$Percentage <- round(FNhom2$Percentage/sum(FNhom2$Percentage)*100,2)
+
+FNhom3 <-as.data.frame(table(round(rowSums(apply(Nhom3[,c(2:26)],2,as.numeric))/25*10,1)))
+colnames(FNhom3) <- c("Diem", "Sinh Vien")
+FNhom3$Percentage <- round(FNhom3$Percentage/sum(FNhom3$Percentage)*100,2)
+
+GNhom1 <- ggplot(FNhom1, aes(x = as.character(FNhom1[,1]), y = FNhom1[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=FNhom1[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Nhom 1", x = "Diem", y = "%SV cua nhom") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GNhom2 <- ggplot(FNhom2, aes(x = as.character(FNhom2[,1]), y = FNhom2[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=FNhom2[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Nhom 2", x = "Diem", y = "%SV cua nhom") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GNhom3 <- ggplot(FNhom3, aes(x = as.character(FNhom3[,1]), y = FNhom3[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=FNhom3[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Nhom 3", x = "Diem", y = "%SV cua nhom") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GNhom <- ggarrange(GNhom1,GNhom2,GNhom3, ncol = 3)
+
+GNhom
+
+#conclusion: 
+#Nhom3 has high grade with highest average grade
+#Nhom1 has low grade with lowest average grade
+#Nhom2 has average grade slightly lower than Nhom3
+
+#Problem 6------------------------------
+#we trying to find question that only less than kp% of student have the right answer
+#which kp is our threshold
+#let's set kp = 10% (we could reset kp if we want)
+
+kp <- 10
+
+DiemGKCK
+GW <- ggarrange(GLOW.GK11, GLOW12, GLOW.GK21, GLOW.GK22, GLOW23, GLOW31, GLOW.CK32, ncol=3, nrow = 3)
+
+GW
+
+#Learning outcome 11 appeared in midterm only
+
+EVALO11.GK21<- round(apply(DiemGK.1921.LO[-1,DiemGK.1921.LO[1,]==11],2,sum)/nrow(DiemGK.1921.LO)*100,1)
+EVALO11.GK22<- round(apply(DiemGK.1922.LO[-1,DiemGK.1922.LO[1,]==11],2,sum)/nrow(DiemGK.1922.LO)*100,1)
+EVALO11.GK23<- round(apply(DiemGK.1923.LO[-1,DiemGK.1923.LO[1,]==11],2,sum)/nrow(DiemGK.1923.LO)*100,1)
+EVALO11.GK24<- round(apply(DiemGK.1924.LO[-1,DiemGK.1924.LO[1,]==11],2,sum)/nrow(DiemGK.1924.LO)*100,1)
+EVALO11.GK21
+EVALO11.GK22
+EVALO11.GK23
+EVALO11.GK24
+
+#questions needed to be revised for Learning out come 11
+EVALO11.GK21[EVALO11.GK21 < kp]
+EVALO11.GK22[EVALO11.GK22 < kp]
+EVALO11.GK23[EVALO11.GK23 < kp]
+EVALO11.GK24[EVALO11.GK24 < kp]
+
+
+
+#Learning outcome 12
+
+
+EVALO12.GK21<- round(apply(DiemGK.1921.LO[-1,DiemGK.1921.LO[1,]==12],2,sum)/nrow(DiemGK.1921.LO)*100,1)
+EVALO12.GK22<- round(apply(DiemGK.1922.LO[-1,DiemGK.1922.LO[1,]==12],2,sum)/nrow(DiemGK.1922.LO)*100,1)
+EVALO12.GK23<- round(apply(DiemGK.1923.LO[-1,DiemGK.1923.LO[1,]==12],2,sum)/nrow(DiemGK.1923.LO)*100,1)
+EVALO12.GK24<- round(apply(DiemGK.1924.LO[-1,DiemGK.1924.LO[1,]==12],2,sum)/nrow(DiemGK.1924.LO)*100,1)
+EVALO12.GK21
+EVALO12.GK22
+EVALO12.GK23
+EVALO12.GK24
+
+#questions needed to be revised for Learning out come 12 - midterm
+#result show 0 with kp = 10%
+EVALO12.GK21[EVALO12.GK21 < kp]
+EVALO12.GK22[EVALO12.GK22 < kp]
+EVALO12.GK23[EVALO12.GK23 < kp]
+EVALO12.GK24[EVALO12.GK24 < kp]
+
+
+
+EVALO12.CK21<- round(apply(DiemCK.1921.LO[-1,DiemCK.1921.LO[1,]==12],2,sum)/nrow(DiemCK.1921.LO)*100,1)
+EVALO12.CK22<- round(apply(DiemCK.1922.LO[-1,DiemCK.1922.LO[1,]==12],2,sum)/nrow(DiemCK.1922.LO)*100,1)
+EVALO12.CK23<- round(apply(DiemCK.1923.LO[-1,DiemCK.1923.LO[1,]==12],2,sum)/nrow(DiemCK.1923.LO)*100,1)
+EVALO12.CK24<- round(apply(DiemCK.1924.LO[-1,DiemCK.1924.LO[1,]==12],2,sum)/nrow(DiemCK.1924.LO)*100,1)
+EVALO12.CK21
+EVALO12.CK22
+EVALO12.CK23
+EVALO12.CK24
+
+#questions needed to be revised for Learning out come 12 -final
+#result show 0 with kp = 10%
+EVALO12.CK21[EVALO12.CK21 < kp]
+EVALO12.CK22[EVALO12.CK22 < kp]
+EVALO12.CK23[EVALO12.CK23 < kp]
+EVALO12.CK24[EVALO12.CK24 < kp]
+
+#Learning outcome 12 don't have any question need to be revised.
+
+
+#Learning outcome 21 - midterm only
+
+
+EVALO21.GK21<- round(apply(DiemGK.1921.LO[-1,DiemGK.1921.LO[1,]==21],2,sum)/nrow(DiemGK.1921.LO)*100,1)
+EVALO21.GK22<- round(apply(DiemGK.1922.LO[-1,DiemGK.1922.LO[1,]==21],2,sum)/nrow(DiemGK.1922.LO)*100,1)
+EVALO21.GK23<- round(apply(DiemGK.1923.LO[-1,DiemGK.1923.LO[1,]==21],2,sum)/nrow(DiemGK.1923.LO)*100,1)
+EVALO21.GK24<- round(apply(DiemGK.1924.LO[-1,DiemGK.1924.LO[1,]==21],2,sum)/nrow(DiemGK.1924.LO)*100,1)
+EVALO21.GK21
+EVALO21.GK22
+EVALO21.GK23
+EVALO21.GK24
+
+#questions needed to be revised for Learning out come 21 - midterm
+
+EVALO21.GK21[EVALO21.GK21 < kp]
+EVALO21.GK22[EVALO21.GK22 < kp]
+EVALO21.GK23[EVALO21.GK23 < kp]
+EVALO21.GK24[EVALO21.GK24 < kp]
+
+#Learning outcome 22 - midterm only
+
+
+EVALO22.GK21<- round(apply(DiemGK.1921.LO[-1,DiemGK.1921.LO[1,]==22],2,sum)/nrow(DiemGK.1921.LO)*100,1)
+EVALO22.GK22<- round(apply(DiemGK.1922.LO[-1,DiemGK.1922.LO[1,]==22],2,sum)/nrow(DiemGK.1922.LO)*100,1)
+EVALO22.GK23<- round(apply(DiemGK.1923.LO[-1,DiemGK.1923.LO[1,]==22],2,sum)/nrow(DiemGK.1923.LO)*100,1)
+EVALO22.GK24<- round(apply(DiemGK.1924.LO[-1,DiemGK.1924.LO[1,]==22],2,sum)/nrow(DiemGK.1924.LO)*100,1)
+EVALO22.GK21
+EVALO22.GK22
+EVALO22.GK23
+EVALO22.GK24
+
+#questions needed to be revised for Learning out come 22 - midterm
+
+EVALO22.GK21[EVALO22.GK21 < kp]
+EVALO22.GK22[EVALO22.GK22 < kp]
+EVALO22.GK23[EVALO22.GK23 < kp]
+EVALO22.GK24[EVALO22.GK24 < kp]
+
+
+#Learning outcome 23 only appeared at 1922 midterm
+
+
+
+EVALO23.GK22<- round(sum(DiemGK.1922.LO[-1,DiemGK.1922.LO[1,]==23])/nrow(DiemGK.1922.LO)*100,1)
+
+EVALO23.GK22
+
+
+#questions needed to be revised for Learning out come 23 - midterm
+#result show 0 with kp = 10%
+
+EVALO23.GK22[EVALO23.GK22 < kp]
+
+
+
+
+EVALO23.CK21<- round(apply(DiemCK.1921.LO[-1,DiemCK.1921.LO[1,]==23],2,sum)/nrow(DiemCK.1921.LO)*100,1)
+EVALO23.CK22<- round(apply(DiemCK.1922.LO[-1,DiemCK.1922.LO[1,]==23],2,sum)/nrow(DiemCK.1922.LO)*100,1)
+EVALO23.CK23<- round(apply(DiemCK.1923.LO[-1,DiemCK.1923.LO[1,]==23],2,sum)/nrow(DiemCK.1923.LO)*100,1)
+EVALO23.CK24<- round(apply(DiemCK.1924.LO[-1,DiemCK.1924.LO[1,]==23],2,sum)/nrow(DiemCK.1924.LO)*100,1)
+EVALO23.CK21
+EVALO23.CK22
+EVALO23.CK23
+EVALO23.CK24
+
+#questions needed to be revised for Learning out come 23 -final
+#result show 0 with kp = 10%
+EVALO23.CK21[EVALO23.CK21 < kp]
+EVALO23.CK22[EVALO23.CK22 < kp]
+EVALO23.CK23[EVALO23.CK23 < kp]
+EVALO23.CK24[EVALO23.CK24 < kp]
+
+
+#Learning outcome 31
+
+
+EVALO31.GK21<- round(apply(DiemGK.1921.LO[-1,DiemGK.1921.LO[1,]==31],2,sum)/nrow(DiemGK.1921.LO)*100,1)
+EVALO31.GK22<- round(apply(DiemGK.1922.LO[-1,DiemGK.1922.LO[1,]==31],2,sum)/nrow(DiemGK.1922.LO)*100,1)
+EVALO31.GK23<- round(apply(DiemGK.1923.LO[-1,DiemGK.1923.LO[1,]==31],2,sum)/nrow(DiemGK.1923.LO)*100,1)
+EVALO31.GK24<- round(apply(DiemGK.1924.LO[-1,DiemGK.1924.LO[1,]==31],2,sum)/nrow(DiemGK.1924.LO)*100,1)
+EVALO31.GK21
+EVALO31.GK22
+EVALO31.GK23
+EVALO31.GK24
+
+#questions needed to be revised for Learning out come 31 - midterm
+#result show 0 with kp = 10%
+EVALO31.GK21[EVALO31.GK21 < kp]
+EVALO31.GK22[EVALO31.GK22 < kp]
+EVALO31.GK23[EVALO31.GK23 < kp]
+EVALO31.GK24[EVALO31.GK24 < kp]
+
+
+
+EVALO31.CK21<- round(apply(DiemCK.1921.LO[-1,DiemCK.1921.LO[1,]==31],2,sum)/nrow(DiemCK.1921.LO)*100,1)
+EVALO31.CK22<- round(apply(DiemCK.1922.LO[-1,DiemCK.1922.LO[1,]==31],2,sum)/nrow(DiemCK.1922.LO)*100,1)
+EVALO31.CK23<- round(apply(DiemCK.1923.LO[-1,DiemCK.1923.LO[1,]==31],2,sum)/nrow(DiemCK.1923.LO)*100,1)
+EVALO31.CK24<- round(apply(DiemCK.1924.LO[-1,DiemCK.1924.LO[1,]==31],2,sum)/nrow(DiemCK.1924.LO)*100,1)
+EVALO31.CK21
+EVALO31.CK22
+EVALO31.CK23
+EVALO31.CK24
+
+#questions needed to be revised for Learning out come 31 -final
+#result show 0 with kp = 10%
+EVALO31.CK21[EVALO31.CK21 < kp]
+EVALO31.CK22[EVALO31.CK22 < kp]
+EVALO31.CK23[EVALO31.CK23 < kp]
+EVALO31.CK24[EVALO31.CK24 < kp]
+
+
+#Learning outcome 32
+
+EVALO32.CK21<- round(apply(DiemCK.1921.LO[-1,DiemCK.1921.LO[1,]==32],2,sum)/nrow(DiemCK.1921.LO)*100,1)
+EVALO32.CK22<- round(apply(DiemCK.1922.LO[-1,DiemCK.1922.LO[1,]==32],2,sum)/nrow(DiemCK.1922.LO)*100,1)
+EVALO32.CK23<- round(apply(DiemCK.1923.LO[-1,DiemCK.1923.LO[1,]==32],2,sum)/nrow(DiemCK.1923.LO)*100,1)
+EVALO32.CK24<- round(apply(DiemCK.1924.LO[-1,DiemCK.1924.LO[1,]==32],2,sum)/nrow(DiemCK.1924.LO)*100,1)
+EVALO32.CK21
+EVALO32.CK22
+EVALO32.CK23
+EVALO32.CK24
+
+#questions needed to be revised for Learning out come 32 -final
+#8 questions of 4 Made need to be revised
+EVALO32.CK21[EVALO32.CK21 < kp]
+EVALO32.CK22[EVALO32.CK22 < kp]
+EVALO32.CK23[EVALO32.CK23 < kp]
+EVALO32.CK24[EVALO32.CK24 < kp]
+
+
+
+#conclusion learning outcome and question needed to be revised are listed as below:
+
+#Learning outcome 11 only appeared in midterm
+EVALO11.GK21[EVALO11.GK21 < kp]
+EVALO11.GK22[EVALO11.GK22 < kp]
+EVALO11.GK23[EVALO11.GK23 < kp]
+EVALO11.GK24[EVALO11.GK24 < kp]
+
+#Learning outcome 21 only appeared in midterm
+
+EVALO21.GK21[EVALO21.GK21 < kp]
+EVALO21.GK22[EVALO21.GK22 < kp]
+EVALO21.GK23[EVALO21.GK23 < kp]
+EVALO21.GK24[EVALO21.GK24 < kp]
+
+#Learning outcome 23 only need revised final
+EVALO23.CK21[EVALO23.CK21 < kp]
+EVALO23.CK22[EVALO23.CK22 < kp]
+EVALO23.CK23[EVALO23.CK23 < kp]
+EVALO23.CK24[EVALO23.CK24 < kp]
+
+#Learning outcome 32
+EVALO32.CK21[EVALO32.CK21 < kp]
+EVALO32.CK22[EVALO32.CK22 < kp]
+EVALO32.CK23[EVALO32.CK23 < kp]
+EVALO32.CK24[EVALO32.CK24 < kp]
+
+
+

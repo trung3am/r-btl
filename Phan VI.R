@@ -492,3 +492,68 @@ EVALO32.CK24[EVALO32.CK24 < kp]
 
 
 
+#For Chapter ----
+
+GKChapter <- read.xlsx2("192_CO1007.xlsx", sheetIndex = 3, startRow = 1, endRow = 16)
+
+#select Learning outcome
+
+GKChapter <- GKChapter[12:15, 1:26]
+table(apply(GKChapter[,-1],2,as.numeric))/4
+
+
+CKChapter <- read.xlsx2("192_CO1007.xlsx", sheetIndex = 5, startRow = 1, endRow = 16)
+CKChapter <- CKChapter[12:15, 1:30]
+#select Learning outcome
+table(apply(CKChapter[,-1],2,as.character))/4
+
+#Chapter in midterm 1-7
+#Chapter in final 8-11 & 6
+
+#Building data frame
+
+DiemGK.Chapter.1921 <- DiemGK.1921
+DiemGK.Chapter.1922 <- DiemGK.1922
+DiemGK.Chapter.1923 <- DiemGK.1923
+DiemGK.Chapter.1924 <- DiemGK.1924
+
+DiemCK.Chapter.1921 <- DiemCK.1921
+DiemCK.Chapter.1922 <- DiemCK.1922
+DiemCK.Chapter.1923 <- DiemCK.1923
+DiemCK.Chapter.1924 <- DiemCK.1924
+
+
+colnames(DiemGK.Chapter.1921) <- paste("Ch",GKChapter[GKChapter[,1]==1921,-1],"-Q",c(1:25), "-De21", sep  = "")
+colnames(DiemGK.Chapter.1922) <- paste("Ch",GKChapter[GKChapter[,1]==1922,-1],"-Q",c(1:25), "-De22", sep  = "")
+colnames(DiemGK.Chapter.1923) <- paste("Ch",GKChapter[GKChapter[,1]==1923,-1],"-Q",c(1:25), "-De23", sep  = "")
+colnames(DiemGK.Chapter.1924) <- paste("Ch",GKChapter[GKChapter[,1]==1924,-1],"-Q",c(1:25), "-De24", sep  = "")
+
+colnames(DiemCK.Chapter.1921) <- paste("Ch",CKChapter[CKChapter[,1]==1921,-1],"-Q",c(1:25), "-De21", sep  = "")
+colnames(DiemCK.Chapter.1922) <- paste("Ch",CKChapter[CKChapter[,1]==1922,-1],"-Q",c(1:25), "-De22", sep  = "")
+colnames(DiemCK.Chapter.1923) <- paste("Ch",CKChapter[CKChapter[,1]==1923,-1],"-Q",c(1:25), "-De23", sep  = "")
+colnames(DiemCK.Chapter.1924) <- paste("Ch",CKChapter[CKChapter[,1]==1924,-1],"-Q",c(1:25), "-De24", sep  = "")
+
+
+
+DiemGK.Chapter.1921 <-round(colSums(apply(DiemGK.Chapter.1921[-1,],2,as.numeric))/nrow(DiemGK.1921)*100,1)
+DiemGK.Chapter.1922 <-round(colSums(apply(DiemGK.Chapter.1922[-1,],2,as.numeric))/nrow(DiemGK.1922)*100,1)
+DiemGK.Chapter.1923 <-round(colSums(apply(DiemGK.Chapter.1923[-1,],2,as.numeric))/nrow(DiemGK.1923)*100,1)
+DiemGK.Chapter.1924 <-round(colSums(apply(DiemGK.Chapter.1924[-1,],2,as.numeric))/nrow(DiemGK.1924)*100,1)
+
+DiemCK.Chapter.1921 <-round(colSums(apply(DiemCK.Chapter.1921[-1,],2,as.numeric))/nrow(DiemCK.1921)*100,1)
+DiemCK.Chapter.1922 <-round(colSums(apply(DiemCK.Chapter.1922[-1,],2,as.numeric))/nrow(DiemCK.1922)*100,1)
+DiemCK.Chapter.1923 <-round(colSums(apply(DiemCK.Chapter.1923[-1,],2,as.numeric))/nrow(DiemCK.1923)*100,1)
+DiemCK.Chapter.1924 <-round(colSums(apply(DiemCK.Chapter.1924[-1,],2,as.numeric))/nrow(DiemCK.1924)*100,1)
+
+
+#Question and Chapter need to be revised listed as below
+#Chapter : 1-2-9-10-11
+DiemGK.Chapter.1921[DiemGK.Chapter.1921 < kp]
+DiemGK.Chapter.1922[DiemGK.Chapter.1922 < kp]
+DiemGK.Chapter.1923[DiemGK.Chapter.1923 < kp]
+DiemGK.Chapter.1924[DiemGK.Chapter.1924 < kp]
+
+DiemCK.Chapter.1921[DiemCK.Chapter.1921 < kp]
+DiemCK.Chapter.1922[DiemCK.Chapter.1922 < kp]
+DiemCK.Chapter.1923[DiemCK.Chapter.1923 < kp]
+DiemCK.Chapter.1924[DiemCK.Chapter.1924 < kp]

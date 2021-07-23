@@ -236,11 +236,11 @@ colnames(FNhom1) <- c("Diem", "Percentage")
 FNhom1$Percentage <- round(FNhom1$Percentage/sum(FNhom1$Percentage)*100,2)
 
 FNhom2 <-as.data.frame(table(round(rowSums(apply(Nhom2[,c(2:26)],2,as.numeric))/25*10,1)))
-colnames(FNhom2) <- c("Diem", "Sinh Vien")
+colnames(FNhom2) <- c("Diem", "Percentage")
 FNhom2$Percentage <- round(FNhom2$Percentage/sum(FNhom2$Percentage)*100,2)
 
 FNhom3 <-as.data.frame(table(round(rowSums(apply(Nhom3[,c(2:26)],2,as.numeric))/25*10,1)))
-colnames(FNhom3) <- c("Diem", "Sinh Vien")
+colnames(FNhom3) <- c("Diem", "Percentage")
 FNhom3$Percentage <- round(FNhom3$Percentage/sum(FNhom3$Percentage)*100,2)
 
 GNhom1 <- ggplot(FNhom1, aes(x = as.character(FNhom1[,1]), y = FNhom1[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=FNhom1[,2]), vjust=-0.3, size=3.5, )+

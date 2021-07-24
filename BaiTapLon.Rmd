@@ -1,0 +1,1998 @@
+---
+title: "Bai tap lon Mon Cau truc roi rac"
+output: html_notebook
+---
+
+```{r}
+# Cai dat cac thu vien can thiet
+# install.packages("moments")
+# install.packages("dplyr")
+# install.packages("readxl")
+# install.packages("ggplot2)
+# install.packages("hrbrthemes")
+```
+
+
+```{r}
+# Load cac thu vien can thiet
+library(moments) # Dung de thuc hien cac fucntion Statistics
+library(dplyr) # Dung de lam viec voi cac Dataframe
+library(readxl) # Dung de doc file Excel
+library(xlsx)
+library(ggplot2) # Dung de ve do thi
+library(gridExtra) # Dung de  dan layout cho cac plot
+library(grid)
+library(hrbrthemes) # Dung de load theme cho cac plot
+library(ggpubr)
+```
+
+```{r}
+# Tao dataframe Giua ky tu trich xuat file Excel - sheet "GK"
+dataGK <- read_excel("192_CO1007.xlsx", sheet = "GK", skip = 4)
+dataGK[!complete.cases(dataGK),]
+
+# Tao dataframe Cuoi ky tu trich xuat file Excel - sheet "CK"
+dataCK <- read_excel("192_CO1007.xlsx", sheet = "CK", skip = 4)
+
+# Hien thi dataframe Giua ky
+dataGK
+
+# Hien thi dataframe Cuoi ky
+dataCK
+```
+```{r}
+# Ket qua cham thi Giua ky
+KetQuaGK <- dataGK[, c("No", "MANH", "TO", "MADE", "1":"25")]
+KetQuaGK
+
+# Bai thi cua Sinh vien Giua ky
+# Boi vi trong BaiThiGK co nhung cau Sinh vien bo trong (value = NA), nen chung ta se khong the goi nhu tren
+BaiThiGK <- dataGK[, c(1, 2, 3, 29:54)]
+BaiThiGK
+
+# Ket qua cham thi Cuoi ky
+KetQuaCK <- dataCK[, c("No", "MANH", "TO", "MADE", "1":"29")]
+KetQuaCK
+
+# Bai thi cua Sinh vien Cuoi ky
+# Tuong tu nhu BaiThiGK
+BaiThiCK <- dataCK[, c(1, 2, 3, 33:62)]
+BaiThiCK
+```
+
+```{r}
+# Dung dplyr to cong So cau dung va So cau sai cua tung Sinh vien
+# Tao Bang So dap an dung va sai cua sinh vien Giua ky
+SoCauDungVaSaiCuaSVGK <- KetQuaGK %>% rowwise() %>%
+  mutate(
+    SoCauDung = sum(c_across("1":"25")),
+    SoCauSai = 25 - sum(c_across("1":"25"))
+  )
+
+# Tao Bang So dap an dung va sai cua sinh vien Cuoi ky
+SoCauDungVaSaiCuaSVCK <- KetQuaCK %>% rowwise() %>%
+  mutate(
+    SoCauDung = sum(c_across("1":"29")),
+    SoCauSai = 29 - sum(c_across("1":"29"))
+  )
+```
+
+```{r}
+# In ra Tong so cau Dung trong ky thi Giua ky cua sinh vien trong tap mau
+TongSoCauDungCuaSVGK = SoCauDungVaSaiCuaSVGK[, c("No", "MANH", "TO", "MADE", "SoCauDung")]
+TongSoCauDungCuaSVGK
+
+# In ra Tong so cau Dung trong ky thi Cuoi ky cua sinh vien trong tap mau
+TongSoCauDungCuaSVCK = SoCauDungVaSaiCuaSVCK[, c("No", "MANH", "TO", "MADE", "SoCauDung")]
+TongSoCauDungCuaSVCK
+```
+
+```{r}
+# In ra Tong so cau Sai trong ky thi Giua ky cua sinh vien trong tap mau
+TongSoCauSaiCuaSVGK = SoCauDungVaSaiCuaSVGK[, c("No", "MANH", "TO", "MADE", "SoCauSai")]
+TongSoCauSaiCuaSVGK
+
+# In ra Tong so cau Sai trong ky thi Cuoi ky cua sinh vien trong tap mau
+TongSoCauSaiCuaSVCK = SoCauDungVaSaiCuaSVCK[, c("No", "MANH", "TO", "MADE", "SoCauSai")]
+TongSoCauSaiCuaSVCK
+```
+
+
+```{r}
+# Xac dinh cau dung nhieu nhat va nho nhat trong tap mau Giua ky
+# Tinh ra Danh sach (List) so lan Dung cua moi cau Giua ky
+SoCauDungGK <- colSums(dataGK[,c(4:28)])
+CauDungNhieuNhatGK <- subset(SoCauDungGK, SoCauDungGK == max(SoCauDungGK))
+CauDungItNhatGK <- subset(SoCauDungGK,SoCauDungGK == min(SoCauDungGK))
+sprintf("Cau %s la cau duoc chon dung nhieu nhat Giua ky voi %s lan chon dung", names(CauDungNhieuNhatGK), CauDungNhieuNhatGK)
+sprintf("Cau %s la cau duoc chon dung it nhat Giua ky chi voi %s lan chon dung", names(CauDungItNhatGK), CauDungItNhatGK)
+
+# Xac dinh cau dung nhieu nhat va nho nhat trong tap mau Cuoi ky
+# Tinh ra Danh sach (List) so lan Dung cua moi cau Cuoi ky
+SoCauDungCK <- colSums(dataCK[,c(4:32)])
+CauDungNhieuNhatCK <- subset(SoCauDungCK,SoCauDungCK == max(SoCauDungCK))
+CauDungItNhatCK <- subset(SoCauDungCK,SoCauDungCK == min(SoCauDungCK))
+sprintf("Cau %s la cau duoc chon dung nhieu nhat Cuoi ky voi %s lan chon dung", names(CauDungNhieuNhatCK), CauDungNhieuNhatCK)
+sprintf("Cau %s la cau duoc chon dung it nhat Cuoi ky chi voi %s lan chon dung", names(CauDungItNhatCK), CauDungItNhatCK)
+```
+
+```{r fig.height = 10, fig.width = 10}
+# Tinh So lan chon dung moi cau theo ma de Giua ky
+# Tao subset tu TongSoCauDungCuaSVGK chi gom tung MADE 1921
+SoCauDungGK1921 <- subset(TongSoCauDungCuaSVGK, TongSoCauDungCuaSVGK$MADE == 1921)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1921
+SoLanChonDungGK1921 <- table(SoCauDungGK1921$SoCauDung)
+dDungGK1921 <- data.frame(SoLanChonDungGK1921)
+colnames(dDungGK1921) <- c("SoCauDung", "SoSinhVien")
+pDungGK1921 <- ggplot(dDungGK1921, aes(x=SoCauDung, y=SoSinhVien)) + geom_bar(stat="identity", fill="steelblue") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauDungCuaSVGK chi gom tung MADE 1922
+SoCauDungGK1922 <- subset(TongSoCauDungCuaSVGK, TongSoCauDungCuaSVGK$MADE == 1922)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1922
+SoLanChonDungGK1922 <- table(SoCauDungGK1922$SoCauDung)
+dDungGK1922 <- data.frame(SoLanChonDungGK1922)
+colnames(dDungGK1922) <- c("SoCauDung", "SoSinhVien")
+pDungGK1922 <- ggplot(dDungGK1922, aes(x=SoCauDung, y=SoSinhVien)) + geom_bar(stat="identity", fill="darkgoldenrod1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauDungCuaSVGK chi gom tung MADE 1923
+SoCauDungGK1923 <- subset(TongSoCauDungCuaSVGK, TongSoCauDungCuaSVGK$MADE == 1923)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1922
+SoLanChonDungGK1923 <- table(SoCauDungGK1923$SoCauDung)
+dDungGK1923 <- data.frame(SoLanChonDungGK1923)
+colnames(dDungGK1923) <- c("SoCauDung", "SoSinhVien")
+pDungGK1923 <- ggplot(dDungGK1923, aes(x=SoCauDung, y=SoSinhVien)) + geom_bar(stat="identity", fill="darkseagreen") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauDungCuaSVGK chi gom tung MADE 1924
+SoCauDungGK1924 <- subset(TongSoCauDungCuaSVGK, TongSoCauDungCuaSVGK$MADE == 1924)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1924
+SoLanChonDungGK1924 <- table(SoCauDungGK1924$SoCauDung)
+dDungGK1924 <- data.frame(SoLanChonDungGK1924)
+colnames(dDungGK1924) <- c("SoCauDung", "SoSinhVien")
+pDungGK1924 <- ggplot(dDungGK1924, aes(x=SoCauDung, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Hien thi 4 bieu do
+g <- grid.arrange(
+  arrangeGrob(pDungGK1921, bottom = "Đề 1921"),
+  arrangeGrob(pDungGK1922, bottom = "Đề 1922"),
+  arrangeGrob(pDungGK1923, bottom = "Đề 1923"),
+  arrangeGrob(pDungGK1924, bottom = "Đề 1924"),
+  nrow = 2,
+  bottom = "Tổng số các câu đúng của sinh viên theo Mã đề của tập mẫu Giữa kỳ"
+)
+
+# Luu hinh anh vao thu muc hinh
+ggsave("hinh/5241_tongsocaudung_gk.jpg", g)
+```
+
+
+```{r fig.height = 10, fig.width = 10}
+# Tinh So lan chon dung moi cau theo ma de Cuoi ky
+# Tao subset tu TongSoCauDungCuaSVCK chi gom tung MADE 1921
+SoCauDungCK1921 <- subset(TongSoCauDungCuaSVCK, TongSoCauDungCuaSVCK$MADE == 1921)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1921
+SoLanChonDungCK1921 <- table(SoCauDungCK1921$SoCauDung)
+dDungCK1921 <- data.frame(SoLanChonDungCK1921)
+colnames(dDungCK1921) <- c("SoCauDung", "SoSinhVien")
+pDungCK1921 <- ggplot(dDungCK1921, aes(x=SoCauDung, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauDungCuaSVCK chi gom tung MADE 1922
+SoCauDungCK1922 <- subset(TongSoCauDungCuaSVCK, TongSoCauDungCuaSVCK$MADE == 1922)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1922
+SoLanChonDungCK1922 <- table(SoCauDungCK1922$SoCauDung)
+dDungCK1922 <- data.frame(SoLanChonDungCK1922)
+colnames(dDungCK1922) <- c("SoCauDung", "SoSinhVien")
+pDungCK1922 <- ggplot(dDungCK1922, aes(x=SoCauDung, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauDungCuaSVCK chi gom tung MADE 1923
+SoCauDungCK1923 <- subset(TongSoCauDungCuaSVCK, TongSoCauDungCuaSVCK$MADE == 1923)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1922
+SoLanChonDungCK1923 <- table(SoCauDungCK1923$SoCauDung)
+dDungCK1923 <- data.frame(SoLanChonDungCK1923)
+colnames(dDungCK1923) <- c("SoCauDung", "SoSinhVien")
+pDungCK1923 <- ggplot(dDungCK1923, aes(x=SoCauDung, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauDungCuaSVCK chi gom tung MADE 1924
+SoCauDungCK1924 <- subset(TongSoCauDungCuaSVCK, TongSoCauDungCuaSVCK$MADE == 1924)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1924
+SoLanChonDungCK1924 <- table(SoCauDungCK1924$SoCauDung)
+dDungCK1924 <- data.frame(SoLanChonDungCK1924)
+colnames(dDungCK1924) <- c("SoCauDung", "SoSinhVien")
+pDungCK1924 <- ggplot(dDungCK1924, aes(x=SoCauDung, y=SoSinhVien)) +  geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Hien thi 4 bieu do
+g <- grid.arrange(
+  arrangeGrob(pDungGK1921, bottom = "Đề 1921"),
+  arrangeGrob(pDungGK1922, bottom = "Đề 1922"),
+  arrangeGrob(pDungGK1923, bottom = "Đề 1923"),
+  arrangeGrob(pDungGK1924, bottom = "Đề 1924"),
+  nrow = 2,
+  bottom = "Tổng số các câu đúng của sinh viên theo Mã đề của tập mẫu Cuối kỳ"
+)
+
+# Luu hinh anh vao thu muc hinh
+ggsave("hinh/5242_tongsocaudung_ck.jpg", g)
+```
+
+
+```{r fig.height = 10, fig.width = 10}
+# Tinh So lan chon sai moi cau theo ma de Giua ky
+# Tao subset tu TongSoCauSaiCuaSVGK chi gom tung MADE 1921
+SoCauSaiGK1921 <- subset(TongSoCauSaiCuaSVGK, TongSoCauSaiCuaSVGK$MADE == 1921)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1921
+SoLanChonSaiGK1921 <- table(SoCauSaiGK1921$SoCauSai)
+dSaiGK1921 <- data.frame(SoLanChonSaiGK1921)
+colnames(dSaiGK1921) <- c("SoCauSai", "SoSinhVien")
+pSaiGK1921 <- ggplot(dSaiGK1921, aes(x=SoCauSai, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauSaiCuaSVGK chi gom tung MADE 1922
+SoCauSaiGK1922 <- subset(TongSoCauSaiCuaSVGK, TongSoCauSaiCuaSVGK$MADE == 1922)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1922
+SoLanChonSaiGK1922 <- table(SoCauSaiGK1922$SoCauSai)
+dSaiGK1922 <- data.frame(SoLanChonSaiGK1922)
+colnames(dSaiGK1922) <- c("SoCauSai", "SoSinhVien")
+pSaiGK1922 <- ggplot(dSaiGK1922, aes(x=SoCauSai, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauSaiCuaSVGK chi gom tung MADE 1923
+SoCauSaiGK1923 <- subset(TongSoCauSaiCuaSVGK, TongSoCauSaiCuaSVGK$MADE == 1923)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1922
+SoLanChonSaiGK1923 <- table(SoCauSaiGK1923$SoCauSai)
+dSaiGK1923 <- data.frame(SoLanChonSaiGK1923)
+colnames(dSaiGK1923) <- c("SoCauSai", "SoSinhVien")
+pSaiGK1923 <- ggplot(dSaiGK1923, aes(x=SoCauSai, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauSaiCuaSVGK chi gom tung MADE 1924
+SoCauSaiGK1924 <- subset(TongSoCauSaiCuaSVGK, TongSoCauSaiCuaSVGK$MADE == 1924)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1924
+SoLanChonSaiGK1924 <- table(SoCauSaiGK1924$SoCauSai)
+dSaiGK1924 <- data.frame(SoLanChonSaiGK1924)
+colnames(dSaiGK1924) <- c("SoCauSai", "SoSinhVien")
+pSaiGK1924 <- ggplot(dSaiGK1924, aes(x=SoCauSai, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Hien thi 4 bieu do
+g <- grid.arrange(
+  arrangeGrob(pDungGK1921, bottom = "Đề 1921"),
+  arrangeGrob(pDungGK1922, bottom = "Đề 1922"),
+  arrangeGrob(pDungGK1923, bottom = "Đề 1923"),
+  arrangeGrob(pDungGK1924, bottom = "Đề 1924"),
+  nrow = 2,
+  bottom = "Tổng số các câu đúng của sinh viên theo Mã đề của tập mẫu Giữa kỳ"
+)
+
+# Luu hinh anh vao thu muc hinh
+# ggsave("hinh/5243_tongsocausai_gk.jpg", g)
+```
+```{r fig.height = 10, fig.width = 10}
+# Tinh So lan chon sai moi cau theo ma de Cuoi ky
+# Tao subset tu TongSoCauSaiCuaSVCK chi gom tung MADE 1921
+SoCauSaiCK1921 <- subset(TongSoCauSaiCuaSVCK, TongSoCauSaiCuaSVCK$MADE == 1921)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1921
+SoLanChonSaiCK1921 <- table(SoCauSaiCK1921$SoCauSai)
+dSaiCK1921 <- data.frame(SoLanChonSaiCK1921)
+colnames(dSaiCK1921) <- c("SoCauSai", "SoSinhVien")
+pSaiCK1921 <- ggplot(dSaiCK1921, aes(x=SoCauSai, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauSaiCuaSVCK chi gom tung MADE 1922
+SoCauSaiCK1922 <- subset(TongSoCauSaiCuaSVCK, TongSoCauSaiCuaSVCK$MADE == 1922)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1922
+SoLanChonSaiCK1922 <- table(SoCauSaiCK1922$SoCauSai)
+dSaiCK1922 <- data.frame(SoLanChonSaiCK1922)
+colnames(dSaiCK1922) <- c("SoCauSai", "SoSinhVien")
+pSaiCK1922 <- ggplot(dSaiCK1922, aes(x=SoCauSai, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauSaiCuaSVCK chi gom tung MADE 1923
+SoCauSaiCK1923 <- subset(TongSoCauSaiCuaSVCK, TongSoCauSaiCuaSVCK$MADE == 1923)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1922
+SoLanChonSaiCK1923 <- table(SoCauSaiCK1923$SoCauSai)
+dSaiCK1923 <- data.frame(SoLanChonSaiCK1923)
+colnames(dSaiCK1923) <- c("SoCauSai", "SoSinhVien")
+pSaiCK1923 <- ggplot(dSaiCK1923, aes(x=SoCauSai, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Tao subset tu TongSoCauSaiCuaSVCK chi gom tung MADE 1924
+SoCauSaiCK1924 <- subset(TongSoCauSaiCuaSVCK, TongSoCauSaiCuaSVCK$MADE == 1924)
+# Tao matrix 1 x n trong do n la so cau chon dung cua sinh vien the ma de 1924
+SoLanChonSaiCK1924 <- table(SoCauSaiCK1924$SoCauSai)
+dSaiCK1924 <- data.frame(SoLanChonSaiCK1924)
+colnames(dSaiCK1924) <- c("SoCauSai", "SoSinhVien")
+pSaiCK1924 <- ggplot(dSaiCK1924, aes(x=SoCauSai, y=SoSinhVien)) + geom_bar(stat="identity", fill="coral1") + geom_text(aes(label = SoSinhVien, y = SoSinhVien), size = 3.5, vjust = 1.6)
+
+# Hien thi 4 bieu do
+g <- grid.arrange(
+  arrangeGrob(pDungGK1921, bottom = "Đề 1921"),
+  arrangeGrob(pDungGK1922, bottom = "Đề 1922"),
+  arrangeGrob(pDungGK1923, bottom = "Đề 1923"),
+  arrangeGrob(pDungGK1924, bottom = "Đề 1924"),
+  nrow = 2,
+  bottom = "Tổng số các câu đúng của sinh viên theo Mã đề của tập mẫu Cuối kỳ"
+)
+
+# Luu hinh anh vao thu muc hinh
+ggsave("hinh/5244_tongsocausai_ck.jpg", g)
+```
+Phan III
+```{r}
+# Tinh diem cua moi sinh vien trong ky thi Giua ky va Cuoi ky
+dataGK$TongDiemGK = (round(rowSums(dataGK[,c(4:28)])/25*10,1))
+dataCK$TongDiemCK = (round(rowSums(dataCK[,c(4:32)])/29*10,1))
+
+# Tao ra 1 table moi chi gom 2 cot No & TongDiemGK/TongDiemCK
+DiemCuaMoiSVGK<- select(dataGK,No,TongDiemGK)
+DiemCuaMoiSVCK<- select(dataCK,No,TongDiemCK)
+
+# Theme cho table
+thm <- ttheme_minimal(
+  core=list(bg_params = list(fill = blues9[1:4], col=NA),
+            fg_params=list(fontface=3)),
+  colhead=list(fg_params=list(col="navyblue", fontface=4L)),
+  rowhead=list(fg_params=list(col="orange", fontface=3L)))
+
+# Dan 2 table diem Giua ky va Cuoi ky
+g <- grid.arrange(
+  tableGrob(head(DiemCuaMoiSVGK, 10), theme = thm),
+  tableGrob(head(DiemCuaMoiSVCK, 10), theme = thm),
+  ncol=2
+)
+# Luu hinh anh vao thu muc hinh
+# ggsave("hinh/5311_diem.jpg", g)
+```
+```{r}
+# Tao 1 bang moi bang cach join 2 bang DiemCuaMoiSVCK & DiemCuaMoiSVGK
+DiemTongKet<-full_join(DiemCuaMoiSVCK,DiemCuaMoiSVGK)
+DiemTongKet$TongKet = round(((rowSums(DiemTongKet[,c(2:2)])*0.6 +
+                                rowSums(DiemTongKet[,c(3:3)])*0.4)),1)
+DiemTongKet
+
+# Theme cho table
+thm <- ttheme_minimal(
+  core=list(bg_params = list(fill = blues9[1:4], col=NA),
+            fg_params=list(fontface=3)),
+  colhead=list(fg_params=list(col="navyblue", fontface=4L)),
+  rowhead=list(fg_params=list(col="orange", fontface=3L)))
+
+# Dan 2 table diem Giua ky va Cuoi ky
+g <- grid.arrange(
+  tableGrob(head(DiemTongKet, 10), theme = thm),
+  ncol=1
+)
+# Luu hinh anh vao thu muc hinh
+# ggsave("hinh/5321_diem.jpg", g)
+```
+
+```{r}
+# Tinh Trung vi mau, Cuc dai mau, Cuc tieu mau cua ky thi Giua ky
+TrungViMauGK <- round(median(dataGK$TongDiemGK), 2)
+CucDaiMauGK <- round(max(dataGK$TongDiemGK), 2)
+CucTieuMauGK <- round(min(dataGK$TongDiemGK), 2)
+
+# Tinh Trung vi mau, Cuc dai mau, Cuc tieu mau cua ky thi Giua ky
+TrungViMauCK <- round(median(dataCK$TongDiemCK), 2)
+CucDaiMauCK <- round(max(dataCK$TongDiemCK), 2)
+CucTieuMauCK <- round(min(dataCK$TongDiemCK), 2)
+
+# Tao 1 dataframe de plot table
+df <- data.frame(
+  row.names = c("Giua ky", "Cuoi ky"),
+  TrungViMau = c(TrungViMauGK, TrungViMauCK),
+  CucDaiMau = c(CucDaiMauGK, CucDaiMauCK),
+  CucTieuMau = c(CucTieuMauGK, CucTieuMauCK)
+)
+
+# Theme cho table
+thm <- ttheme_minimal(
+  core=list(bg_params = list(fill = blues9[1:4], col=NA),
+            fg_params=list(fontface=3)),
+  colhead=list(fg_params=list(col="navyblue", fontface=4L)),
+  rowhead=list(fg_params=list(col="orange", fontface=3L)))
+
+# Dan 2 table diem Giua ky va Cuoi ky
+g <- grid.arrange(
+  tableGrob(df, theme = thm),
+  ncol=1
+)
+# Luu hinh anh vao thu muc hinh
+ggsave("hinh/5311_medianmaxmin.jpg", g)
+```
+
+```{r}
+# Dung subset de loai cac gia tri co N/A
+SinhVienCoDiemGKLonHonBang9 <- nrow(subset(DiemTongKet, TongDiemGK >= 9))
+SinhVienCoDiemCKLonHonBang9 <- nrow(subset(DiemTongKet, TongDiemCK >= 9))
+sprintf("So sinh vien co diem Giua ky lon hon hoac bang 9 la %s", SinhVienCoDiemGKLonHonBang9)
+sprintf("So sinh vien co diem Cuoi ky lon hon hoac bang 9 la %s", SinhVienCoDiemCKLonHonBang9)
+```
+
+```{r}
+SinhVienCoDiemGKLonHonBang7 <- nrow(subset(DiemTongKet, TongDiemGK >= 7))
+SinhVienCoDiemCKLonHonBang7 <- nrow(subset(DiemTongKet, TongDiemCK >= 7))
+sprintf("So sinh vien co diem Giua ky lon hon hoac bang 7 la %s", SinhVienCoDiemGKLonHonBang7)
+sprintf("So sinh vien co diem Cuoi ky lon hon hoac bang 7 la %s", SinhVienCoDiemCKLonHonBang7)
+```
+
+```{r}
+SinhVienCoDiemGKLonHonBang5 <- nrow(subset(DiemTongKet, TongDiemGK >= 5))
+SinhVienCoDiemCKLonHonBang5 <- nrow(subset(DiemTongKet, TongDiemCK >= 5))
+sprintf("So sinh vien co diem Giua ky lon hon hoac bang 5 la %s", SinhVienCoDiemGKLonHonBang5)
+sprintf("So sinh vien co diem Cuoi ky lon hon hoac bang 5 la %s", SinhVienCoDiemCKLonHonBang5)
+```
+
+```{r}
+SinhVienCoDiemGKNhoHon5 <-nrow(subset(DiemTongKet, TongDiemGK < 5))
+SinhVienCoDiemCKNhoHon5 <- nrow(subset(DiemTongKet, TongDiemCK < 5))
+sprintf("So sinh vien co diem Giua ky nho hon 5 la %s", SinhVienCoDiemGKNhoHon5)
+sprintf("So sinh vien co diem Cuoi ky nho hon 5 la %s", SinhVienCoDiemCKNhoHon5)
+```
+
+
+```{r fig.height = 10, fig.width = 10}
+# Plot diem Giua ky
+# Tao 1  table moi dua tren col TongDiemGK de dem so occurrence cua moi diem Giua ky
+dfDemDiemGK <- data.frame(table(dataGK$TongDiemGK))
+colnames(dfDemDiemGK) <- c("DiemGK", "SoSV")
+plotDiemGK <- ggplot(dfDemDiemGK, aes(x=DiemGK, y=SoSV)) +
+  geom_line(color="grey", aes(group=1)) +
+  geom_point(shape=21, color="black", fill="steelblue", size=6) + theme_ipsum() +
+  xlab("Diem") + ylab("So Sinh vien") +
+  theme(panel.background=element_rect(fill="cornsilk", colour=NA)) +
+  geom_text(aes(label=SoSV, hjust=-1.5, vjust=0))
+
+# Plot diem Cuoi ky
+# Tao 1  table moi dua tren col TongDiemCK de dem so occurrence cua moi diem Cuoi ky
+dfDemDiemCK <- data.frame(table(dataCK$TongDiemCK))
+colnames(dfDemDiemCK) <- c("DiemCK", "SoSV")
+plotDiemCK <- ggplot(dfDemDiemCK, aes(x=DiemCK, y=SoSV)) +
+  geom_line(color="grey", aes(group=1)) +
+  geom_point(shape=21, color="black", fill="coral1", size=6) + theme_ipsum() +
+  xlab("Diem") + ylab("So Sinh vien") +
+  theme(panel.background=element_rect(fill="cornsilk", colour=NA)) +
+  geom_text(aes(label=SoSV, hjust=-1.5, vjust=0))
+
+# Hien thi 2 bieu do
+g <- grid.arrange(
+  arrangeGrob(plotDiemGK, bottom = "Diem Giua ky"),
+  arrangeGrob(plotDiemCK, bottom = "Diem Cuoi ky"),
+  nrow = 2, ncol = 1
+)
+# Luu hinh anh vao thu muc hinh
+# ggsave("hinh/5361_plotphodiemsinhvien.jpg", g)
+
+```
+```{r}
+# Tao 1 table moi tu dataGK voi tat ca cac column va voi cac row co TongDiemGK la cao nhat
+SVDiemCaoNhatGK<- select(dataGK[dataGK[,"TongDiemGK"] == max(dataGK$TongDiemGK),], No, MANH, TO,TongDiemGK)
+
+# Tao 1 table moi tu dataCK voi tat ca cac column va voi cac row co TongDiemCK la cao nhat
+SVDiemCaoNhatCK<- select(dataCK[dataCK[,"TongDiemCK"] == max(dataCK$TongDiemCK),], No, MANH, TO,TongDiemCK)
+
+# Theme cho table
+thm <- ttheme_minimal(
+  core=list(bg_params = list(fill = blues9[1:4], col=NA),
+            fg_params=list(fontface=3)),
+  colhead=list(fg_params=list(col="navyblue", fontface=4L)),
+  rowhead=list(fg_params=list(col="orange", fontface=3L)))
+
+# Dan 2 table diem Giua ky va Cuoi ky
+g <- grid.arrange(
+  tableGrob(head(SVDiemCaoNhatGK, 10,), theme = thm),
+  tableGrob(head(SVDiemCaoNhatCK, 10), theme = thm),
+  ncol=2, nrow=1
+)
+# Luu hinh anh vao thu muc hinh
+# ggsave("hinh/5371_diemcaonhat.jpg", g)
+```
+
+```{r}
+# Tao 1 table moi tu dataGK voi tat ca cac column va voi cac row co TongDiemGK la nho nhat
+SVDiemNhoNhatGK<- select(dataGK[dataGK[,"TongDiemGK"] == min(dataGK$TongDiemGK),], No, MANH, TO,TongDiemGK)
+
+# Tao 1 table moi tu dataGK voi tat ca cac column va voi cac row co TongDiemGK la nho nhat
+SVDiemNhoNhatCK<- select(dataCK[dataCK[,"TongDiemCK"] == min(dataCK$TongDiemCK),], No, MANH, TO,TongDiemCK)
+
+# Theme cho table
+thm <- ttheme_minimal(
+  core=list(bg_params = list(fill = blues9[1:4], col=NA),
+            fg_params=list(fontface=3)),
+  colhead=list(fg_params=list(col="navyblue", fontface=4L)),
+  rowhead=list(fg_params=list(col="orange", fontface=3L)))
+
+# Dan 2 table diem Giua ky va Cuoi ky
+g <- grid.arrange(
+  tableGrob(head(SVDiemNhoNhatGK, 10,), theme = thm),
+  tableGrob(head(SVDiemNhoNhatCK, 10), theme = thm),
+  ncol=2, nrow=1
+)
+# Luu hinh anh vao thu muc hinh
+# ggsave("hinh/5381_diemthapnhat.jpg", g)
+```
+
+```{r}
+DiemTrungBinhGK <- round(mean(DiemCuaMoiSVGK$TongDiemGK),1)
+DiemTrungBinhCK <- round(mean(DiemCuaMoiSVCK$TongDiemCK),1)
+sprintf("Diem trung binh cua cac sinh vien trong tap mau Giua ky la %s", DiemTrungBinhGK)
+sprintf("Diem trung binh cua cac sinh vien trong tap mau Cuoi ky la %s", DiemTrungBinhCK)
+```
+
+```{r}
+SVCoDiemTrungBinhGK <-nrow(select(dataGK[dataGK[,"TongDiemGK"] == DiemTrungBinhGK,], No, MANH, TO,TongDiemGK))
+SVCoDiemTrungBinhCK <-nrow(select(dataCK[dataCK[,"TongDiemCK"] == DiemTrungBinhCK,], No, MANH, TO,TongDiemCK))
+sprintf("So sinh vien co diem trung binh %s trong tap mau Giua ky la %s", DiemTrungBinhGK, SVCoDiemTrungBinhGK)
+sprintf("So sinh vien co diem trung binh %s trong tap mau Cuoi ky la %s", DiemTrungBinhCK, SVCoDiemTrungBinhCK)
+```
+
+```{r}
+# Xac dinh do phan tan cua diem so chinh la Standard Deviation
+DoPhanTanGK <- sd(DiemCuaMoiSVGK$TongDiemGK)
+DoPhanTanCK <- sd(DiemCuaMoiSVCK$TongDiemCK)
+
+# Tao dataframe de chuan bi plot bieu do
+dfPhanTan <- data.frame(
+  KyThi = c("Giua ky", "Cuoi ky"),
+  DiemTrungBinh = c(DiemTrungBinhGK, DiemTrungBinhCK),
+  DoPhanTan = c(DoPhanTanGK, DoPhanTanCK)
+)
+g <- ggplot(dfPhanTan, aes(x=KyThi, y=DiemTrungBinh)) +
+  geom_errorbar(aes(ymin=round(DiemTrungBinh - DoPhanTan, 2), ymax=round(DiemTrungBinh + DoPhanTan, 2)), width=0.2, color="coral1") +
+  geom_text(aes(label = round(DiemTrungBinh - DoPhanTan, 2), y = round(DiemTrungBinh - DoPhanTan, 2)), vjust = 1.5) +
+  geom_text(aes(label = round(DiemTrungBinh + DoPhanTan, 2), y = round(DiemTrungBinh + DoPhanTan, 2)), vjust = -.5) +
+  geom_point(shape=21, color="black", fill="steelblue", size=6) +
+  geom_text(aes(label=round(DoPhanTan, 2)),hjust=1.5, vjust=0, color="coral1") +
+  labs(y="Muc do phan tan cua diem so", x="Ky thi")
+# Luu hinh anh vao thu muc hinh
+# ggsave("hinh/53111_mucdophantan.jpg", g)
+```
+
+
+```{r}
+# Cau III.12
+# Tinh do meo lech cua du lieu bang ham skewness
+skewnessGK <- skewness(DiemCuaMoiSVGK$TongDiemGK)
+skewnessCK <- skewness(DiemCuaMoiSVCK$TongDiemCK)
+sprintf("Do meo lech (skewness) cua du lieu trong mau Giua ky la %s", skewnessGK)
+sprintf("Do meo lech (skewness) cua du lieu trong mau Cuoi ky la %s", skewnessCK)
+
+# Tinh do nhon cua du lieu bang ham kurtosis
+kurtosisGK <- kurtosis(DiemCuaMoiSVGK$TongDiemGK)
+kurtosisCK <- kurtosis(DiemCuaMoiSVCK$TongDiemCK)
+sprintf("Do nhon (kurtosis) cua du lieu trong mau Giua ky la %s", kurtosisGK)
+sprintf("Do nhon (kurtosis) cua du lieu trong mau Cuoi ky la %s", kurtosisCK)
+```
+
+```{r}
+# Cau III.13
+# Giat thich Q1 va Q3
+# 0% -> 25% -> 50% -> 75% -> 100%
+# min -> Q1 -> mean -> Q3 -> max
+# Tinh Q1 & Q3 cho tap mau Giua ky
+Q1GK = quantile(DiemCuaMoiSVGK$TongDiemGK,0.25)
+Q3GK = quantile(DiemCuaMoiSVGK$TongDiemGK,0.75)
+sprintf("Tu phan vi (quartile) thu nhat (Q1) va thu ba (Q3) cua tap mau Giua ky lan luot la %s va %s", Q1GK, Q3GK)
+
+# Tinh Q1 & Q3 cho tap mau Cuoi ky
+Q1CK = quantile(DiemCuaMoiSVCK$TongDiemCK,0.25)
+Q3CK = quantile(DiemCuaMoiSVCK$TongDiemCK,0.75)
+sprintf("Tu phan vi (quartile) thu nhat (Q1) va thu ba (Q3) cua tap mau Cuoi ky lan luot la %s va %s", Q1CK, Q3CK)
+```
+
+```{r}
+# Cau III.14
+# Tao ham tinh ra table chua ca sinh vien co muc diem Giua ky cao thu K
+GKK <- function(k){
+  temp<-table(round(TongSoCauDungCuaSVGK$SoCauDung/25*10,1))
+  options(digits = 2)
+  muc <- as.double(names(temp[length(temp)- k + 1]))
+  DS <- dataGK[dataGK[,"TongDiemGK"] == muc,]
+  return(DS)
+}
+
+# Tao ham tinh ra table chua ca sinh vien co muc diem Cuoi ky cao thu K
+CKK <- function(k){
+  temp<-table(round(TongSoCauDungCuaSVCK$SoCauDung/29*10,1))
+  options(digits = 2)
+  muc <- as.double(names(temp[length(temp)- k + 1]))
+  DS <- dataCK[dataCK[,"TongDiemCK"] == muc,]
+  return(DS)
+}
+
+# Tao table voi tat ca column va lay nhung row co TongDiemGK o muc diem cao nhat trong tap mau Giua ky va Cuoi ky
+DSSVQ3GK <- rbind(GKK(1), GKK(2))
+DSSVQ3CK <- rbind(CKK(1), CKK(2))
+
+# So luong sinh vien chinh la so dong (row) cua table moi tao
+SoSVQ3GK = nrow(DSSVQ3GK)
+SoSVQ3CK = nrow(DSSVQ3CK)
+sprintf("So sinh vien co diem so nam trong 2 muc diem cao nhat trong tap Giua ky la %s", SoSVQ3GK)
+sprintf("So sinh vien co diem so nam trong 2 muc diem cao nhat trong tap Cuoi ky la %s", SoSVQ3CK)
+```
+
+```{r fig.height = 10, fig.width = 10}
+# Cau III.15
+# Plot diem Giua ky
+# Tao 1  table moi dua tren col TongDiemGK de dem so occurrence cua moi diem lon hon Q3 cua tap mau Giua ky
+dfDemDiemQ3GK <- data.frame(table(DSSVQ3GK$TongDiemGK))
+colnames(dfDemDiemQ3GK) <- c("DiemGK", "SoSV")
+plotDiemQ3GK <- ggplot(dfDemDiemQ3GK, aes(x=DiemGK, y=SoSV)) +
+  geom_line(color="grey", aes(group=1)) +
+  geom_point(shape=21, color="black", fill="steelblue", size=6) + theme_ipsum() +
+  xlab("Diem") + ylab("So Sinh vien") +
+  theme(panel.background=element_rect(fill="cornsilk", colour=NA)) +
+  geom_text(aes(label=SoSV, hjust=-1.5, vjust=0))
+
+# Plot diem cuoi ky
+# Tao 1  table moi dua tren col TongDiemCK de dem so occurrence cua moi diem lon hon Q3 cua tap mau Cuoi ky
+dfDemDiemQ3CK <- data.frame(table(DSSVQ3CK$TongDiemCK))
+colnames(dfDemDiemQ3CK) <- c("DiemCK", "SoSV")
+plotDiemQ3CK <- ggplot(dfDemDiemQ3CK, aes(x=DiemCK, y=SoSV)) +
+  geom_line(color="grey", aes(group=1)) +
+  geom_point(shape=21, color="black", fill="coral1", size=6) + theme_ipsum() +
+  xlab("Diem") + ylab("So Sinh vien") +
+  theme(panel.background=element_rect(fill="cornsilk", colour=NA)) +
+  geom_text(aes(label=SoSV, hjust=-1.5, vjust=0))
+
+# Hien thi 2 bieu do
+g <- grid.arrange(
+  arrangeGrob(plotDiemQ3GK, bottom = "Diem Giua ky"),
+  arrangeGrob(plotDiemQ3CK, bottom = "Diem Cuoi ky"),
+  nrow = 2, ncol = 1
+)
+g
+# Luu hinh anh vao thu muc hinh
+ggsave("hinh/53151_plotphodiemsinhvienQ3.jpg", g)
+```
+```{r fig.height = 10, fig.width = 10}
+# Cau III.16
+# Tan dung lai 2 ham GKK & CKK de tinh so sinh vien co muc diem cao thu K
+# Dat k = 5
+k = 5
+# Tao table voi tat ca column va lay nhung row co TongDiemGK o muc diem cao thu k trong tap mau Giua ky va Cuoi ky
+DSSV_K_GK <- GKK(k) 
+DSSV_K_CK <- CKK(k)
+
+# So luong sinh vien chinh la so dong (row) cua table moi tao
+SoSV_K_GK = nrow(DSSV_K_GK)
+SoSV_K_CK = nrow(DSSV_K_CK)
+sprintf("So sinh vien co diem so voi muc diem cao thu %s trong tap Giua ky la %s", k, SoSV_K_GK)
+sprintf("So sinh vien co diem so voi muc diem cao thu %s trong tap Cuoi ky la %s", k, SoSVQ3CK)
+```
+```{r fig.height = 10, fig.width = 10}
+# Cau III.17
+# Plot diem Giua ky
+# Tao 1  table moi dua tren col TongDiemGK de dem so occurrence cua moi diem lon hon Q3 cua tap mau Giua ky
+plotDemDiemK <- function(kythi, dssv) {
+  if (kythi == "GK") {
+    dfDemDiemK <- data.frame(table(dssv$TongDiemGK))
+    colnames(dfDemDiemK) <- c("DiemGK", "SoSV")
+    return(
+      ggplot(dfDemDiemK, aes(x=DiemGK, y=SoSV)) +
+        geom_line(color="grey", aes(group=1)) +
+        geom_point(shape=21, color="black", fill="steelblue", size=6) + theme_ipsum() +
+        xlab("Diem") + ylab("So Sinh vien") +
+        theme(panel.background=element_rect(fill="cornsilk", colour=NA)) +
+        geom_text(aes(label=SoSV, hjust=-1.5, vjust=0))
+    )
+  } else if (kythi == "CK") {
+    dfDemDiemK <- data.frame(table(dssv$TongDiemCK))
+    colnames(dfDemDiemK) <- c("DiemCK", "SoSV")
+    return(
+      ggplot(dfDemDiemK, aes(x=DiemCK, y=SoSV)) +
+        geom_line(color="grey", aes(group=1)) +
+        geom_point(shape=21, color="black", fill="coral1", size=6) + theme_ipsum() +
+        xlab("Diem") + ylab("So Sinh vien") +
+        theme(panel.background=element_rect(fill="cornsilk", colour=NA)) +
+        geom_text(aes(label=SoSV, hjust=-1.5, vjust=0))
+    )
+  }
+}
+
+# Chon 3 K lan luoi bang 5, 3, 9 cho ca 2 tap mau Giua ky va Cuoi ky
+dssv_k5_GK <- GKK(5)
+dssv_k3_GK <- GKK(3)
+dssv_k9_GK <- GKK(9)
+dssv_GK <- rbind(dssv_k3_GK, dssv_k5_GK, dssv_k9_GK)
+plotDiem_K_GK <- plotDemDiemK("GK", dssv_GK)
+
+dssv_k5_CK <- CKK(5)
+dssv_k3_CK <- CKK(3)
+dssv_k9_CK <- CKK(9)
+dssv_CK <- rbind(dssv_k3_CK, dssv_k5_CK, dssv_k9_CK)
+plotDiem_K_CK <- plotDemDiemK("CK", dssv_CK)
+
+# Ve table chua K
+# Theme cho table
+thm <- ttheme_minimal(
+  core=list(bg_params = list(fill = blues9[1:4], col=NA),
+            fg_params=list(fontface=3)),
+  colhead=list(fg_params=list(col="navyblue", fontface=4L)),
+  rowhead=list(fg_params=list(col="orange", fontface=3L)))
+
+dfTableK <- data.frame(
+  k = c("3", "5", "9"),
+  DiemGK = c(dssv_k3_GK$TongDiemGK[[1]], dssv_k5_GK$TongDiemGK[[1]], dssv_k9_GK$TongDiemGK[[1]]),
+  DiemCK = c(dssv_k3_CK$TongDiemCK[[1]], dssv_k5_CK$TongDiemCK[[1]], dssv_k9_CK$TongDiemCK[[1]])
+)
+# Dan 2 table diem Giua ky va Cuoi ky
+g <- grid.arrange(
+  tableGrob(dfTableK, theme = thm),
+  ncol=1
+)
+
+# Luu hinh anh vao thu muc hinh
+# ggsave("hinh/53171_thongtink.jpg", g)
+
+# Hien thi 2 bieu do
+grid.newpage()
+g <- grid.arrange(
+  arrangeGrob(plotDiem_K_GK, bottom = "Diem Giua ky"),
+  arrangeGrob(plotDiem_K_CK, bottom = "Diem Cuoi ky"),
+  nrow = 2, ncol = 1
+)
+
+# Luu hinh anh vao thu muc hinh
+# ggsave("hinh/53172_plotphodiemsinhvienK.jpg", g)
+```
+
+Phan IV
+```{r}
+# Import du lieu thi Giua ky
+DFGK <- read.xlsx2("192_CO1007.xlsx", sheetIndex = 3, startRow = 1, endRow = 16)
+
+# Import du lieu thi Cuoi ky
+DFCK <- read.xlsx2("192_CO1007.xlsx", sheetIndex = 5, startRow = 1, endRow = 16)
+```
+
+```{r}
+# Xac dinh cac chuan dau ra xuat hien trong tap mau Giua ky
+GKCDR <- DFGK[7:10, 1:26]
+# Tao ra 1 matrix co chieu dai 1 x n (voi n la column tu X1 - X25)
+GKCDR.1921 <- GKCDR %>% filter(GKCDR[1] == "1921") %>% select(X1:X25) %>% apply(2,as.numeric)
+GKCDR.1922 <- GKCDR %>% filter(GKCDR[1] == "1922") %>% select(X1:X25) %>% apply(2,as.numeric)
+GKCDR.1923 <- GKCDR %>% filter(GKCDR[1] == "1923") %>% select(X1:X25) %>% apply(2,as.numeric)
+GKCDR.1924 <- GKCDR %>% filter(GKCDR[1] == "1924") %>% select(X1:X25) %>% apply(2,as.numeric)
+
+# Xac dinh cac chuan dau ra xuat hien trong tap mau Cuoi ky
+CKCDR <- DFCK[7:10, 1:30]
+# Tao ra 1 matrix co chieu dai 1 x n (voi n la column tu X1 - X29)
+CKCDR.1921 <- CKCDR %>% filter(CKCDR[1] == "1921") %>% select(X1:X29) %>% apply(2,as.numeric)
+CKCDR.1922 <- CKCDR %>% filter(CKCDR[1] == "1922") %>% select(X1:X29) %>% apply(2,as.numeric)
+CKCDR.1923 <- CKCDR %>% filter(CKCDR[1] == "1923") %>% select(X1:X29) %>% apply(2,as.numeric)
+CKCDR.1924 <- CKCDR %>% filter(CKCDR[1] == "1924") %>% select(X1:X29) %>% apply(2,as.numeric)
+```
+
+
+```{r}
+# Cau IV.1
+# table(GKCDR.1921) se group cac chuan dau ra lai cung voi count cua tung chuan dau ra.
+# So luong chuan dau ra lien quan den cac cau hoi xuat hien trong tap mau Giua ky
+sprintf("So luong chuan dau ra lien quan den cac cau hoi xuat hien trong de 1921 trong tap mau Giua ky la %s", length(names(table(GKCDR.1921))))
+sprintf("So luong chuan dau ra lien quan den cac cau hoi xuat hien trong de 1922 trong tap mau Giua ky la %s", length(names(table(GKCDR.1922))))
+sprintf("So luong chuan dau ra lien quan den cac cau hoi xuat hien trong de 1923 trong tap mau Giua ky la %s", length(names(table(GKCDR.1923))))
+sprintf("So luong chuan dau ra lien quan den cac cau hoi xuat hien trong de 1924 trong tap mau Giua ky la %s", length(names(table(GKCDR.1924))))
+```
+
+```{r}
+# So luong chuan dau ra lien quan den cac cau hoi xuat hien trong tap mau Cuoi ky
+sprintf("So luong chuan dau ra lien quan den cac cau hoi xuat hien trong de 1921 trong tap mau Cuoi ky la %s", length(names(table(CKCDR.1921))))
+sprintf("So luong chuan dau ra lien quan den cac cau hoi xuat hien trong de 1922 trong tap mau Cuoi ky la %s", length(names(table(CKCDR.1922))))
+sprintf("So luong chuan dau ra lien quan den cac cau hoi xuat hien trong de 1923 trong tap mau Cuoi ky la %s", length(names(table(CKCDR.1923))))
+sprintf("So luong chuan dau ra lien quan den cac cau hoi xuat hien trong de 1924 trong tap mau Cuoi ky la %s", length(names(table(CKCDR.1924))))
+```
+
+```{r}
+# Cau IV.2
+# Danh sach cac chuan dau ra chi tiet lien quan den cac cau hoi xuat hien trong tap mau Giua ky
+# NOTE: names([table-object]) -> lay tat ca 
+# NOTE: paste([list-object], collapse = ", ") => chuyen list thanh string cach nhau bang dau ", "
+sprintf("Danh sach cac chuan dau ra lien quan den cac cau hoi xuat hien trong ma de 1921 trong tap mau Giua ky lan luot la %s", paste(names(table(GKCDR.1921)), collapse = ', '))
+sprintf("Danh sach cac chuan dau ra lien quan den cac cau hoi xuat hien trong ma de 1922 trong tap mau Giua ky lan luot la %s", paste(names(table(GKCDR.1922)), collapse = ', '))
+sprintf("Danh sach cac chuan dau ra lien quan den cac cau hoi xuat hien trong ma de 1923 trong tap mau Giua ky lan luot la %s", paste(names(table(GKCDR.1923)), collapse = ', '))
+sprintf("Danh sach cac chuan dau ra lien quan den cac cau hoi xuat hien trong ma de 1924 trong tap mau Giua ky lan luot la %s", paste(names(table(GKCDR.1924)), collapse = ','))
+```
+
+```{r}
+# Danh sach cac chuan dau ra chi tiet lien quan den cac cau hoi xuat hien trong tap mau Cuoi ky
+sprintf("Danh sach cac chuan dau ra lien quan den cac cau hoi xuat hien trong ma de 1921 trong tap mau Cuoi ky lan luot la %s", paste(names(table(CKCDR.1921)), collapse = ', '))
+sprintf("Danh sach cac chuan dau ra lien quan den cac cau hoi xuat hien trong ma de 1922 trong tap mau Cuoi ky lan luot la %s", paste(names(table(CKCDR.1922)), collapse = ', '))
+sprintf("Danh sach cac chuan dau ra lien quan den cac cau hoi xuat hien trong ma de 1923 trong tap mau Cuoi ky lan luot la %s", paste(names(table(CKCDR.1923)), collapse = ', '))
+sprintf("Danh sach cac chuan dau ra lien quan den cac cau hoi xuat hien trong ma de 1924 trong tap mau Cuoi ky lan luot la %s", paste(names(table(CKCDR.1924)), collapse = ', '))
+```
+
+```{r fig.height = 15, fig.width = 15}
+# Cau IV.3
+#Graph Tan suat cua Chuan dau ra o tap mau Giua ky
+G3GK.data1921 <- as.data.frame(table(GKCDR.1921))
+G3GK.data1922 <- as.data.frame(table(GKCDR.1922))
+G3GK.data1923 <- as.data.frame(table(GKCDR.1923))
+G3GK.data1924 <- as.data.frame(table(GKCDR.1924))
+#MD 1921, 1923, 1924 share mutual frequency
+
+G3GK1921 <- ggplot(G3GK.data1921, aes(x = GKCDR.1921,y =G3GK.data1921[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=G3GK.data1921[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Bieu do tan suat Learning outcome GK-1921 ", x = "Learning outcome", y = "Frequency") +
+  theme(panel.background = element_rect(fill = "#ffaa80"))
+
+G3GK1922 <- ggplot(G3GK.data1922, aes(x = GKCDR.1922,y =G3GK.data1922[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=G3GK.data1922[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Bieu do tan suat Learning outcome GK-1922", x = "Learning outcome", y = "Frequency") +
+  theme(panel.background = element_rect(fill = "#ffaa80"))
+
+G3GK1923 <- ggplot(G3GK.data1923, aes(x = GKCDR.1923,y =G3GK.data1923[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=G3GK.data1923[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Bieu do tan suat Learning outcome GK-1922", x = "Learning outcome", y = "Frequency") +
+  theme(panel.background = element_rect(fill = "#ffaa80"))
+
+G3GK1924 <- ggplot(G3GK.data1924, aes(x = GKCDR.1924,y =G3GK.data1924[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=G3GK.data1924[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Bieu do tan suat Learning outcome GK-1922", x = "Learning outcome", y = "Frequency") +
+  theme(panel.background = element_rect(fill = "#ffaa80"))
+
+G3GK <- ggarrange(G3GK1921, G3GK1922, G3GK1923, G3GK1924, ncol = 2, nrow = 2)
+G3GK
+# ggsave("hinh/5431_plotchuandauragk.jpg", G3GK)
+```
+
+```{r fig.height = 15, fig.width = 15}
+#Graph Tan suat cua Chuan dau ra o tap mau Cuoi ky
+G3CK.data1921 <- as.data.frame(table(CKCDR.1921))
+G3CK.data1922 <- as.data.frame(table(CKCDR.1922))
+G3CK.data1923 <- as.data.frame(table(CKCDR.1923))
+G3CK.data1924 <- as.data.frame(table(CKCDR.1924))
+#MD 1921, 1923, 1924 share mutual frequency
+
+G3CK1921 <- ggplot(G3CK.data1921, aes(x = CKCDR.1921,y =G3CK.data1921[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=G3CK.data1921[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Bieu do tan suat Learning outcome GK-1921 ", x = "Learning outcome", y = "Frequency") +
+  theme(panel.background = element_rect(fill = "cornsilk"))
+
+G3CK1922 <- ggplot(G3CK.data1922, aes(x = CKCDR.1922,y =G3CK.data1922[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=G3CK.data1922[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Bieu do tan suat Learning outcome GK-1922", x = "Learning outcome", y = "Frequency") +
+  theme(panel.background = element_rect(fill = "cornsilk"))
+
+G3CK1923 <- ggplot(G3CK.data1923, aes(x = CKCDR.1923,y =G3CK.data1923[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=G3CK.data1923[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Bieu do tan suat Learning outcome GK-1922", x = "Learning outcome", y = "Frequency") +
+  theme(panel.background = element_rect(fill = "cornsilk"))
+
+G3CK1924 <- ggplot(G3CK.data1924, aes(x = CKCDR.1924,y =G3CK.data1924[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=G3CK.data1924[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Bieu do tan suat Learning outcome GK-1922", x = "Learning outcome", y = "Frequency") +
+  theme(panel.background = element_rect(fill = "cornsilk"))
+
+G3CK <- ggarrange(G3CK1921, G3CK1922, G3CK1923, G3CK1924, ncol = 2, nrow = 2)
+G3CK
+# ggsave("hinh/5432_plotchuandaurack.jpg", G3GK)
+```
+```{r fig.height = 20, fig.width = 25}
+# Tao dataframe tu file Excel 
+DiemGK <- read.xlsx2("192_CO1007.xlsx", sheetIndex = 2, startRow = 5)
+
+# Don cac truong co ky tu rong
+DiemGK <- DiemGK %>% filter(No != "")
+# Tao matrix moi 
+DiemGK <- subset(DiemGK, select =  No:MADE)
+
+DiemGK.1921 <- DiemGK %>% filter(MADE == 1921) %>% select(X1:X25) %>% apply(2,as.numeric)
+DiemGK.1922 <- DiemGK %>% filter(MADE == 1922) %>% select(X1:X25) %>% apply(2,as.numeric)
+DiemGK.1923 <- DiemGK %>% filter(MADE == 1923) %>% select(X1:X25) %>% apply(2,as.numeric)
+DiemGK.1924 <- DiemGK %>% filter(MADE == 1924) %>% select(X1:X25) %>% apply(2,as.numeric)
+
+#Add Learning outcome at top of data frame
+DiemGK.1921.LO <- as.data.frame(rbind(GKCDR.1921,DiemGK.1921))
+DiemGK.1922.LO <- as.data.frame(rbind(GKCDR.1922,DiemGK.1922))
+DiemGK.1923.LO <- as.data.frame(rbind(GKCDR.1923,DiemGK.1923))
+DiemGK.1924.LO <- as.data.frame(rbind(GKCDR.1924,DiemGK.1924))
+
+#Learning outcome name in midterm
+names(table(GKCDR.1921))
+
+#1921
+# Phan loai theo cac chuan dau ra
+DiemGK.1921.LO11 <- DiemGK.1921.LO[-1,DiemGK.1921.LO[1,] == 11]
+DiemGK.1921.LO12 <- DiemGK.1921.LO[-1,DiemGK.1921.LO[1,] == 12]
+DiemGK.1921.LO21 <- DiemGK.1921.LO[-1,DiemGK.1921.LO[1,] == 21]
+DiemGK.1921.LO22 <- DiemGK.1921.LO[-1,DiemGK.1921.LO[1,] == 22]
+DiemGK.1921.LO31 <- DiemGK.1921.LO[-1,DiemGK.1921.LO[1,] == 31]
+
+# Cong tong theo dong cua dataframe va them Tong moi vao trong data
+DiemGK.1921.LO11 <-table(apply(DiemGK.1921.LO11, 1, sum))
+DiemGK.1921.LO12 <-table(apply(DiemGK.1921.LO12, 1, sum))
+DiemGK.1921.LO21 <-table(apply(DiemGK.1921.LO21, 1, sum))
+DiemGK.1921.LO22 <-table(apply(DiemGK.1921.LO22, 1, sum))
+DiemGK.1921.LO31 <-table(apply(DiemGK.1921.LO31, 1, sum))
+
+
+#1922
+#Sorting answer into learning outcome group
+
+DiemGK.1922.LO11 <- DiemGK.1922.LO[-1,DiemGK.1922.LO[1,] == 11]
+DiemGK.1922.LO12 <- DiemGK.1922.LO[-1,DiemGK.1922.LO[1,] == 12]
+DiemGK.1922.LO21 <- DiemGK.1922.LO[-1,DiemGK.1922.LO[1,] == 21]
+DiemGK.1922.LO22 <- DiemGK.1922.LO[-1,DiemGK.1922.LO[1,] == 22]
+DiemGK.1922.LO31 <- DiemGK.1922.LO[-1,DiemGK.1922.LO[1,] == 31]
+DiemGK.1922.LO23 <- DiemGK.1922.LO[-1,DiemGK.1922.LO[1,] == 23]
+
+#Sum row data frame and map sum result into instance group
+DiemGK.1922.LO11 <-table(apply(DiemGK.1922.LO11, 1, sum))
+DiemGK.1922.LO12 <-table(apply(DiemGK.1922.LO12, 1, sum))
+DiemGK.1922.LO21 <-table(apply(DiemGK.1922.LO21, 1, sum))
+DiemGK.1922.LO22 <-table(apply(DiemGK.1922.LO22, 1, sum))
+DiemGK.1922.LO31 <-table(apply(DiemGK.1922.LO31, 1, sum))
+DiemGK.1922.LO23 <-table(DiemGK.1922.LO23)
+#1923
+#Sorting answer into learning outcome group
+
+DiemGK.1923.LO11 <- DiemGK.1923.LO[-1,DiemGK.1923.LO[1,] == 11]
+DiemGK.1923.LO12 <- DiemGK.1923.LO[-1,DiemGK.1923.LO[1,] == 12]
+DiemGK.1923.LO21 <- DiemGK.1923.LO[-1,DiemGK.1923.LO[1,] == 21]
+DiemGK.1923.LO22 <- DiemGK.1923.LO[-1,DiemGK.1923.LO[1,] == 22]
+DiemGK.1923.LO31 <- DiemGK.1923.LO[-1,DiemGK.1923.LO[1,] == 31]
+DiemGK.1923.LO31 <- DiemGK.1923.LO[-1,DiemGK.1923.LO[1,] == 31]
+
+#Sum row data frame and map sum result into instance group
+DiemGK.1923.LO11 <-table(apply(DiemGK.1923.LO11, 1, sum))
+DiemGK.1923.LO12 <-table(apply(DiemGK.1923.LO12, 1, sum))
+DiemGK.1923.LO21 <-table(apply(DiemGK.1923.LO21, 1, sum))
+DiemGK.1923.LO22 <-table(apply(DiemGK.1923.LO22, 1, sum))
+DiemGK.1923.LO31 <-table(apply(DiemGK.1923.LO31, 1, sum))
+
+
+#1924
+# Phan loai theo cac chuan dau ra
+DiemGK.1924.LO11 <- DiemGK.1924.LO[-1,DiemGK.1924.LO[1,] == 11]
+DiemGK.1924.LO12 <- DiemGK.1924.LO[-1,DiemGK.1924.LO[1,] == 12]
+DiemGK.1924.LO21 <- DiemGK.1924.LO[-1,DiemGK.1924.LO[1,] == 21]
+DiemGK.1924.LO22 <- DiemGK.1924.LO[-1,DiemGK.1924.LO[1,] == 22]
+DiemGK.1924.LO31 <- DiemGK.1924.LO[-1,DiemGK.1924.LO[1,] == 31]
+
+# Cong tong theo dong cua dataframe va them Tong moi vao trong data
+DiemGK.1924.LO11 <-table(apply(DiemGK.1924.LO11, 1, sum))
+DiemGK.1924.LO12 <-table(apply(DiemGK.1924.LO12, 1, sum))
+DiemGK.1924.LO21 <-table(apply(DiemGK.1924.LO21, 1, sum))
+DiemGK.1924.LO22 <-table(apply(DiemGK.1924.LO22, 1, sum))
+DiemGK.1924.LO31 <-table(apply(DiemGK.1924.LO31, 1, sum))
+
+# Learning outcome 11
+LOR.GK11 <- as.data.frame(bind_rows(DiemGK.1921.LO11,DiemGK.1922.LO11,DiemGK.1923.LO11,DiemGK.1924.LO11))
+# Thay cac gia tri N/A thanh 0
+LOR.GK11[is.na(LOR.GK11)] <- 0
+# Cong theo dong
+LOR.GK11 <- as.data.frame(apply(LOR.GK11,2,sum))
+LOR.GK11$SoCauTLDung <- row.names(LOR.GK11)
+
+# xap sep lai data
+LOR.GK11<- transform(LOR.GK11, SoCauTLDung = as.numeric(SoCauTLDung))
+LOR.GK11<- arrange(LOR.GK11,SoCauTLDung)
+
+#Learning outcome 12 (merge into usable data frame)
+LOR.GK12 <- as.data.frame(bind_rows(DiemGK.1921.LO12,DiemGK.1922.LO12,DiemGK.1923.LO12,DiemGK.1924.LO12))
+#Fill N/A cell with 0
+LOR.GK12[is.na(LOR.GK12)] <- 0
+#Sum column
+LOR.GK12 <- as.data.frame(apply(LOR.GK12,2,sum))
+LOR.GK12$SoCauTLDung <- row.names(LOR.GK12)
+
+
+#Learning outcome 21 (merge into usable data frame)
+LOR.GK21 <- as.data.frame(bind_rows(DiemGK.1921.LO21,DiemGK.1922.LO21,DiemGK.1923.LO21,DiemGK.1924.LO21))
+#Fill N/A cell with 0
+LOR.GK21[is.na(LOR.GK21)] <- 0
+#Sum column
+LOR.GK21 <- as.data.frame(apply(LOR.GK21,2,sum))
+
+LOR.GK21$SoCauTLDung <- row.names(LOR.GK21)
+
+
+#Learning outcome 22 (merge into usable data frame)
+LOR.GK22 <- as.data.frame(bind_rows(DiemGK.1921.LO22,DiemGK.1922.LO22,DiemGK.1923.LO22,DiemGK.1924.LO22))
+#Fill N/A cell with 0
+LOR.GK22[is.na(LOR.GK22)] <- 0
+#Sum column
+LOR.GK22 <- as.data.frame(apply(LOR.GK22,2,sum))
+
+LOR.GK22$SoCauTLDung <- row.names(LOR.GK22)
+
+
+#Learning outcome 31 (merge into usable data frame)
+LOR.GK31 <- as.data.frame(bind_rows(DiemGK.1921.LO31,DiemGK.1922.LO31,DiemGK.1923.LO31,DiemGK.1924.LO31))
+#Fill N/A cell with 0
+LOR.GK31[is.na(LOR.GK31)] <- 0
+#Sum column
+LOR.GK31 <- as.data.frame(apply(LOR.GK31,2,sum))
+
+LOR.GK31$SoCauTLDung <- row.names(LOR.GK31)
+
+#Learning outcome 23
+LOR.GK23 <-as.data.frame(DiemGK.1922.LO23)
+LOR.GK23$SoCauTraLoiDung <- LOR.GK23[,1]
+
+GLOR.GK11 <- ggplot(LOR.GK11, aes(x = as.character(LOR.GK11[,2]), y = LOR.GK11[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK11[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 11", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOR.GK12 <-  ggplot(LOR.GK12, aes(x = as.character(LOR.GK12[,2]), y = LOR.GK12[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK12[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 12", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOR.GK21 <- ggplot(LOR.GK21, aes(x = as.character(LOR.GK21[,2]), y = LOR.GK21[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK21[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 21", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOR.GK22 <-  ggplot(LOR.GK22, aes(x = as.character(LOR.GK22[,2]), y = LOR.GK22[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK22[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 22", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOR.GK31 <- ggplot(LOR.GK31, aes(x = as.character(LOR.GK31[,2]), y = LOR.GK31[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK31[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 31", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOR.GK23 <- ggplot(LOR.GK23, aes(x = as.character(LOR.GK23[,3]), y = LOR.GK23[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.GK23[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 23", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+
+GLOR.GK <-ggarrange(GLOR.GK11,GLOR.GK12,GLOR.GK21,GLOR.GK22,GLOR.GK23,GLOR.GK31, ncol = 3, nrow = 2)
+GLOR.GK
+# ggsave("hinh/5451_bieudooutcome_gk.jpg", GLOR.GK)
+```
+
+```{r fig.height = 15, fig.width = 15}
+# Tao dataframe tu file excel cho tap mau Cuoi ky
+DiemCK <- read.xlsx2("192_CO1007.xlsx", sheetIndex = 4, startRow = 5)
+# Loc No rong
+DiemCK <- DiemCK %>% filter(No != "")
+# Tao matrix
+DiemCK <- subset(DiemCK, select =  No:MADE)
+
+DiemCK.1921 <- DiemCK %>% filter(MADE == 1921) %>% select(X1:X29) %>% apply(2,as.numeric)
+DiemCK.1922 <- DiemCK %>% filter(MADE == 1922) %>% select(X1:X29) %>% apply(2,as.numeric)
+DiemCK.1923 <- DiemCK %>% filter(MADE == 1923) %>% select(X1:X29) %>% apply(2,as.numeric)
+DiemCK.1924 <- DiemCK %>% filter(MADE == 1924) %>% select(X1:X29) %>% apply(2,as.numeric)
+
+#Add Learning outcome at top of data frame
+DiemCK.1921.LO <- as.data.frame(rbind(CKCDR.1921,DiemCK.1921))
+DiemCK.1922.LO <- as.data.frame(rbind(CKCDR.1922,DiemCK.1922))
+DiemCK.1923.LO <- as.data.frame(rbind(CKCDR.1923,DiemCK.1923))
+DiemCK.1924.LO <- as.data.frame(rbind(CKCDR.1924,DiemCK.1924))
+
+#Learning outcome name in final exam
+names(table(CKCDR.1921))
+
+#1921
+#S Phan loai theo cac chuan dau ra
+DiemCK.1921.LO12 <- DiemCK.1921.LO[-1,DiemCK.1921.LO[1,] == 12]
+DiemCK.1921.LO23 <- DiemCK.1921.LO[-1,DiemCK.1921.LO[1,] == 23]
+DiemCK.1921.LO31 <- DiemCK.1921.LO[-1,DiemCK.1921.LO[1,] == 31]
+DiemCK.1921.LO32 <- DiemCK.1921.LO[-1,DiemCK.1921.LO[1,] == 32]
+
+# Cong tong theo dong cua dataframe va them Tong moi vao trong data
+DiemCK.1921.LO12 <-table(apply(DiemCK.1921.LO12, 1, sum))
+DiemCK.1921.LO23 <-table(apply(DiemCK.1921.LO23, 1, sum))
+DiemCK.1921.LO31 <-table(apply(DiemCK.1921.LO31, 1, sum))
+DiemCK.1921.LO32 <-table(apply(DiemCK.1921.LO32, 1, sum))
+
+#1922
+#Sorting answer into learning outcome group
+
+
+DiemCK.1922.LO12 <- DiemCK.1922.LO[-1,DiemCK.1922.LO[1,] == 12]
+DiemCK.1922.LO23 <- DiemCK.1922.LO[-1,DiemCK.1922.LO[1,] == 23]
+DiemCK.1922.LO31 <- DiemCK.1922.LO[-1,DiemCK.1922.LO[1,] == 31]
+DiemCK.1922.LO32 <- DiemCK.1922.LO[-1,DiemCK.1922.LO[1,] == 32]
+
+#Sum row data frame and map sum result into instance group
+
+DiemCK.1922.LO12 <-table(apply(DiemCK.1922.LO12, 1, sum))
+DiemCK.1922.LO23 <-table(apply(DiemCK.1922.LO23, 1, sum))
+DiemCK.1922.LO31 <-table(apply(DiemCK.1922.LO31, 1, sum))
+DiemCK.1922.LO32 <-table(apply(DiemCK.1922.LO32, 1, sum))
+
+#1923
+#Sorting answer into learning outcome group
+
+
+DiemCK.1923.LO12 <- DiemCK.1923.LO[-1,DiemCK.1923.LO[1,] == 12]
+DiemCK.1923.LO23 <- DiemCK.1923.LO[-1,DiemCK.1923.LO[1,] == 23]
+DiemCK.1923.LO31 <- DiemCK.1923.LO[-1,DiemCK.1923.LO[1,] == 31]
+DiemCK.1923.LO32 <- DiemCK.1923.LO[-1,DiemCK.1923.LO[1,] == 32]
+
+#Sum row data frame and map sum result into instance group
+
+DiemCK.1923.LO12 <-table(apply(DiemCK.1923.LO12, 1, sum))
+DiemCK.1923.LO23 <-table(apply(DiemCK.1923.LO23, 1, sum))
+DiemCK.1923.LO31 <-table(apply(DiemCK.1923.LO31, 1, sum))
+DiemCK.1923.LO32 <-table(apply(DiemCK.1923.LO32, 1, sum))
+
+#1924
+#Sorting answer into learning outcome group
+
+
+DiemCK.1924.LO12 <- DiemCK.1924.LO[-1,DiemCK.1924.LO[1,] == 12]
+DiemCK.1924.LO23 <- DiemCK.1924.LO[-1,DiemCK.1924.LO[1,] == 23]
+DiemCK.1924.LO31 <- DiemCK.1924.LO[-1,DiemCK.1924.LO[1,] == 31]
+DiemCK.1924.LO32 <- DiemCK.1924.LO[-1,DiemCK.1924.LO[1,] == 32]
+
+#Sum row data frame and map sum result into instance group
+
+DiemCK.1924.LO12 <-table(apply(DiemCK.1924.LO12, 1, sum))
+DiemCK.1924.LO23 <-table(apply(DiemCK.1924.LO23, 1, sum))
+DiemCK.1924.LO31 <-table(apply(DiemCK.1924.LO31, 1, sum))
+DiemCK.1924.LO32 <-table(apply(DiemCK.1924.LO32, 1, sum))
+
+#Learning outcome 12
+LOR.CK12 <- as.data.frame(bind_rows(DiemCK.1921.LO12,DiemCK.1922.LO12,DiemCK.1923.LO12,DiemCK.1924.LO12))
+
+# Thay cac gia tri N/A thanh 0
+LOR.CK12[is.na(LOR.CK12)] <- 0
+# Cong cot
+LOR.CK12 <- as.data.frame(apply(LOR.CK12,2,sum))
+
+# Sap xep lai data
+LOR.CK12$SoCauTLDung <- row.names(LOR.CK12)
+
+#Learning outcome 23 (merge into usable data frame)
+
+LOR.CK23 <- as.data.frame(bind_rows(DiemCK.1921.LO23,DiemCK.1922.LO23,DiemCK.1923.LO23,DiemCK.1924.LO23))
+
+#Fill N/A cell with 0
+LOR.CK23[is.na(LOR.CK23)] <- 0
+#Sum column
+LOR.CK23 <- as.data.frame(apply(LOR.CK23,2,sum))
+
+LOR.CK23$SoCauTLDung <- row.names(LOR.CK23)
+
+#Learning outcome 31 (merge into usable data frame)
+
+LOR.CK31 <- as.data.frame(bind_rows(DiemCK.1921.LO31,DiemCK.1922.LO31,DiemCK.1923.LO31,DiemCK.1924.LO31))
+
+#Fill N/A cell with 0
+LOR.CK31[is.na(LOR.CK31)] <- 0
+#Sum column
+LOR.CK31 <- as.data.frame(apply(LOR.CK31,2,sum))
+
+LOR.CK31$SoCauTLDung <- row.names(LOR.CK31)
+LOR.CK31
+
+#Learning outcome 32 (merge into usable data frame)
+LOR.CK32 <- as.data.frame(bind_rows(DiemCK.1921.LO32,DiemCK.1922.LO32,DiemCK.1923.LO32,DiemCK.1924.LO32))
+
+#Fill N/A cell with 0
+LOR.CK32[is.na(LOR.CK32)] <- 0
+#Sum column
+LOR.CK32 <- as.data.frame(apply(LOR.CK32,2,sum))
+
+LOR.CK32$SoCauTLDung <- row.names(LOR.CK32)
+
+#Graph ----
+GLOR.CK12 <-ggplot(LOR.CK12, aes(x = as.character(LOR.CK12[,2]), y = LOR.CK12[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK12[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 12", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#57d5c5"))
+
+GLOR.CK23 <- ggplot(LOR.CK23, aes(x = as.character(LOR.CK23[,2]), y = LOR.CK23[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK23[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 23", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#57d5c5"))
+
+GLOR.CK31 <-ggplot(LOR.CK31, aes(x = as.character(LOR.CK31[,2]), y = LOR.CK31[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK31[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 31", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#57d5c5"))
+
+GLOR.CK32 <- ggplot(LOR.CK32, aes(x = as.character(LOR.CK32[,2]), y = LOR.CK32[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LOR.CK32[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 32", x = "So cau tra loi dung", y = "So sinh vien") + theme(panel.background = element_rect(fill = "#57d5c5"))
+
+GLOR.CK <-ggarrange(GLOR.CK12,GLOR.CK23,GLOR.CK31,GLOR.CK32, ncol = 2, nrow = 2)
+GLOR.CK
+ggsave("hinh/5452_bieudooutcome_ck.jpg", GLOR.CK)
+```
+```{r}
+# Cau IV.7
+# Data cho Chuan dau ra Giua ky va Cuoi ky
+LO.data<- as.data.frame(bind_rows(table(GKCDR.1921),table(CKCDR.1921)))
+# Chuuyen doi thanh data dung de ve bieu do
+LO.data[is.na(LO.data)] <- 0
+LO.data<- as.data.frame(apply(LO.data,2,sum))
+LO.data$LO <- row.names(LO.data)
+LO.data
+
+# Do thi 
+GLO.data <- ggplot(LO.data, aes(x = as.character(LO.data[,2]), y = LO.data[,1])) + geom_bar(stat = "identity") + geom_text(aes(label=LO.data[,1]), vjust=-0.3, size=3.5, )+
+  labs(title = "Question per learning outcome", x = "Learning outcome", y = "Questions quantity") + theme(panel.background = element_rect(fill = "#57d5c5"))
+GLO.data
+
+ggsave("hinh/5471_bieudocauhoi.jpg", GLO.data)
+
+#
+TotalQFrameCK<-as.data.frame(table(as.numeric(CKCDR[1,-1])))
+
+TotalQFrameGK<-as.data.frame(table(as.numeric(GKCDR[1,-1])))
+
+TotalQFrameGKEX<-as.data.frame(bind_rows(table(GKCDR.1921),
+                                         table(GKCDR.1922),
+                                         table(GKCDR.1923),
+                                         table(GKCDR.1924)))
+TotalQFrameGKEX[is.na(TotalQFrameGKEX)] <- 0
+#exception for 1922 LO 23 & 12
+TotalQFrameGKEX
+```
+
+```{r fig.height = 50, fig.width = 50}
+# Cau IV.8
+#convert data from problem 6 for reuse
+
+LOW.GK11 <- LOR.GK11
+LOW.GK11 <- transform(LOW.GK11, SoCauTLDung = as.numeric(SoCauTLDung))
+LOW.GK11$SoCauTLSai <- abs(LOW.GK11$SoCauTLDung - as.numeric(TotalQFrameGK[1,2]))
+LOW.GK11 <- LOW.GK11[,c(1,3)]
+
+#percentaging
+LOW.GK11$percent <- round(LOW.GK11[,1]/sum(LOW.GK11[,1]),3)
+LOW.GK11
+
+#exception handling for Learning outcome 12 
+
+
+LOW.GK12.1921.3.4<- as.data.frame(bind_rows(DiemGK.1921.LO12,
+                                            DiemGK.1923.LO12,
+                                            DiemGK.1924.LO12,
+                                            ))
+#fill na with 0
+LOW.GK12.1921.3.4[is.na(LOW.GK12.1921.3.4)] <- 0
+
+LOW.GK12.1921.3.4<- as.data.frame(apply(LOW.GK12.1921.3.4,2,sum))
+LOW.GK12.1921.3.4$SoCauTLSai <- abs(as.numeric(row.names(LOW.GK12.1921.3.4)) - 12)
+
+#percentaging
+LOW.GK12.1921.3.4$percent <-round(LOW.GK12.1921.3.4[,1]/sum(LOW.GK12.1921.3.4[,1]),3)
+
+LOW.GK12.1922<-t(as.data.frame(bind_rows(DiemGK.1922.LO12)))
+
+temp1922 <- abs(as.numeric(row.names(LOW.GK12.1922)) - 11)
+
+LOW.GK12.1922<-as.data.frame(DiemGK.1922.LO12)
+LOW.GK12.1922$SoCauTLSai <- as.numeric(temp1922)
+
+LOW.GK12.1922$percent <- round(LOW.GK12.1922[,2]/sum(LOW.GK12.1922[,2]),3)
+LOW.GK12.1922<- LOW.GK12.1922[,c(3,4)]
+
+#reserve
+
+DiemGK.1921.LO12.mod <- DiemGK.1921.LO12
+DiemGK.1922.LO12.mod <- DiemGK.1922.LO12
+DiemGK.1923.LO12.mod <- DiemGK.1923.LO12
+DiemGK.1924.LO12.mod <- DiemGK.1924.LO12
+
+rownames(DiemGK.1921.LO12.mod)<- abs(as.numeric(rownames(DiemGK.1921.LO12)) -12)
+rownames(DiemGK.1922.LO12.mod)<- abs(as.numeric(rownames(DiemGK.1922.LO12)) -11)
+rownames(DiemGK.1923.LO12.mod)<- abs(as.numeric(rownames(DiemGK.1923.LO12)) -12)
+rownames(DiemGK.1924.LO12.mod)<- abs(as.numeric(rownames(DiemGK.1924.LO12)) -12)
+
+LOW.GK12 <- as.data.frame(bind_rows(DiemGK.1921.LO12.mod,
+                                    DiemGK.1922.LO12.mod,
+                                    DiemGK.1923.LO12.mod,
+                                    DiemGK.1924.LO12.mod,
+))
+
+LOW.GK12[is.na(LOW.GK12)] <- 0
+as.numeric(row.names(DiemGK.1921.LO12)) -1
+LOW.GK12<-as.data.frame(apply(LOW.GK12,2,sum))
+LOW.GK12
+LOW.GK12$SoCauTLSai <- abs(as.numeric(row.names(LOW.GK12)))
+LOW.GK12$percent <- round(LOW.GK12[,1]/sum(LOW.GK12[,1]),3)
+LOW.GK12
+
+
+LOW.GK21 <- LOR.GK21
+LOW.GK21 <- transform(LOW.GK21, SoCauTLDung = as.numeric(SoCauTLDung))
+LOW.GK21$SoCauTLSai <- abs(LOW.GK21$SoCauTLDung - as.numeric(TotalQFrameGK[3,2]))
+LOW.GK21 <- LOW.GK21[,c(1,3)]
+LOW.GK21
+#percentaging
+LOW.GK21$percent <- round(LOW.GK21[,1]/sum(LOW.GK21[,1]),3)
+LOW.GK21
+
+
+LOW.GK22 <- LOR.GK22
+LOW.GK22 <- transform(LOW.GK22, SoCauTLDung = as.numeric(SoCauTLDung))
+LOW.GK22$SoCauTLSai <- abs(LOW.GK22$SoCauTLDung - as.numeric(TotalQFrameGK[4,2]))
+LOW.GK22 <- LOW.GK22[,c(1,3)]
+
+#percentaging
+LOW.GK22$percent <- round(LOW.GK22[,1]/sum(LOW.GK22[,1]),3)
+LOW.GK22
+
+LOW.GK31 <- LOR.GK31
+LOW.GK31 <- transform(LOW.GK31, SoCauTLDung = as.numeric(SoCauTLDung))
+LOW.GK31$SoCauTLSai <- abs(LOW.GK31$SoCauTLDung - as.numeric(TotalQFrameGK[5,2]))
+LOW.GK31 <- LOW.GK31[,c(1,3)]
+
+#percentaging
+LOW.GK31$percent <- round(LOW.GK31[,1]/sum(LOW.GK31[,1]),3)
+LOW.GK31
+
+#exception for 1922 code
+LOW.GK23 <- LOR.GK23
+LOW.GK23 <- transform(LOW.GK23, SoCauTraLoiDung = as.numeric(SoCauTraLoiDung))
+LOW.GK23$SoCauTLSai <- abs(as.numeric(LOW.GK23$SoCauTraLoiDung) - 2)
+LOW.GK23 <- LOW.GK23[,c(2,4)]
+
+#percentaging
+LOW.GK23$percent <- round(LOW.GK23[,1]/sum(LOW.GK23[,1]),3)
+LOW.GK23
+
+#Graph ---
+
+GLOW.GK11 <- ggplot(LOW.GK11, aes(x = as.character(LOW.GK11[,2]), y = LOW.GK11[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.GK11[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 11", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.GK12 <-  ggplot(LOW.GK12, aes(x = as.character(LOW.GK12[,2]), y = LOW.GK12[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.GK12[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 12", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.GK21 <- ggplot(LOW.GK21, aes(x = as.character(LOW.GK21[,2]), y = LOW.GK21[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.GK21[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 21", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.GK22 <-  ggplot(LOW.GK22, aes(x = as.character(LOW.GK22[,2]), y = LOW.GK22[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.GK22[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 22", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.GK31 <- ggplot(LOW.GK31, aes(x = as.character(LOW.GK31[,2]), y = LOW.GK31[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.GK31[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 31", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.GK23 <- ggplot(LOW.GK23, aes(x = as.character(LOW.GK23[,2]), y = LOW.GK23[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.GK23[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 31", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.GK12.1.3.4 <- ggplot(LOW.GK12.1921.3.4, aes(x = as.character(LOW.GK12.1921.3.4[,2]), y = LOW.GK12.1921.3.4[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.GK12.1921.3.4[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 12-1921-3-4", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.GK12.2 <- ggplot(LOW.GK12.1922, aes(x = as.character(LOW.GK12.1922[,1]), y = LOW.GK12.1922[,2])) + geom_bar(stat = 
+                                                                                                                   "identity") + geom_text(aes(label=LOW.GK12.1922[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 12-1922", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+
+GLOW.GK <-ggarrange(GLOW.GK11,GLOW.GK12.2,GLOW.GK12.1.3.4,GLOW.GK12,GLOW.GK21,GLOW.GK22,GLOW.GK23,GLOW.GK31, ncol = 3, nrow = 3)
+GLOW.GK
+# ggsave("hinh/5481_bieudotansuatcausaigk.jpg", GLOW.GK)
+```
+
+```{r}
+# Cau IV.9
+#convert data from problem 6 for reuse
+
+LOW.CK12 <- LOR.CK12
+LOW.CK12 <- transform(LOW.CK12, SoCauTLDung = as.numeric(SoCauTLDung))
+LOW.CK12$SoCauTLSai <- abs(LOW.CK12$SoCauTLDung - as.numeric(TotalQFrameCK[1,2]))
+LOW.CK12 <- LOW.CK12[,c(1,3)]
+
+#percentaging
+LOW.CK12$percent <- round(LOW.CK12[,1]/sum(LOW.CK12[,1]),3)
+LOW.CK12
+
+LOW.CK23 <- LOR.CK23
+LOW.CK23 <- transform(LOW.CK23, SoCauTLDung = as.numeric(SoCauTLDung))
+LOW.CK23$SoCauTLSai <- abs(LOW.CK23$SoCauTLDung - as.numeric(TotalQFrameCK[2,2]))
+LOW.CK23 <- LOW.CK23[,c(1,3)]
+
+#percentaging
+LOW.CK23$percent <- round(LOW.CK23[,1]/sum(LOW.CK23[,1]),3)
+LOW.CK23
+
+LOW.CK31 <- LOR.CK31
+LOW.CK31 <- transform(LOW.CK31, SoCauTLDung = as.numeric(SoCauTLDung))
+LOW.CK31$SoCauTLSai <- abs(LOW.CK31$SoCauTLDung - as.numeric(TotalQFrameCK[3,2]))
+LOW.CK31 <- LOW.CK31[,c(1,3)]
+
+#percentaging
+LOW.CK31$percent <- round(LOW.CK31[,1]/sum(LOW.CK31[,1]),3)
+LOW.CK31
+
+LOW.CK32 <- LOR.CK32
+LOW.CK32 <- transform(LOW.CK32, SoCauTLDung = as.numeric(SoCauTLDung))
+LOW.CK32$SoCauTLSai <- abs(LOW.CK32$SoCauTLDung - as.numeric(TotalQFrameCK[4,2]))
+LOW.CK32 <- LOW.CK32[,c(1,3)]
+
+#percentaging
+LOW.CK32$percent <- round(LOW.CK32[,1]/sum(LOW.CK32[,1]),3)
+LOW.CK32
+
+#Graph---
+
+GLOW.CK12 <- ggplot(LOW.CK12, aes(x = as.character(LOW.CK12[,2]), y = LOW.CK12[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.CK12[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 12", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.CK23 <- ggplot(LOW.CK23, aes(x = as.character(LOW.CK23[,2]), y = LOW.CK23[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.CK23[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 23", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.CK31 <- ggplot(LOW.CK31, aes(x = as.character(LOW.CK31[,2]), y = LOW.CK31[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.CK31[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 31", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.CK32 <- ggplot(LOW.CK32, aes(x = as.character(LOW.CK32[,2]), y = LOW.CK32[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW.CK32[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 32", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GLOW.CK <-ggarrange(GLOW.CK12,GLOW.CK23,GLOW.CK31,GLOW.CK32, ncol = 3, nrow = 2)
+
+GLOW.CK
+```
+
+```{r fig.height = 50, fig.width = 75}
+# Cau IV.10
+LoListCK <- data.frame(LO= names(table(CKCDR.1922)))
+LoListGK <- data.frame(LO= names(table(GKCDR.1922)))
+LoAp<-as.data.frame(table(rbind(LoListCK,LoListGK)))
+
+#Lo appeared in both midterm and final
+LoAp[LoAp$Freq == 2,]
+TotalQFrameCK[TotalQFrameCK$Var1 == 12,]
+TotalQFrameGK[TotalQFrameGK$Var1 == 12,]
+
+#Number of students in mid/final 
+nrow(DiemGK)
+nrow(DiemCK)
+#create data with 361 students(based on final)
+#we will deal with 5 last students later
+
+DiemGKCK<- cbind( DiemGK[1:361,],DiemCK)
+#Ma de pool
+md <- as.numeric(CKCDR[,1])
+#add combined made
+DiemGKCK$mdCK_GK <- as.numeric(paste(DiemGKCK[,29] ,DiemGKCK[,62], sep = ""))
+#rearrange
+DiemGKCK <- DiemGKCK[,c(63,1,4:28,33:61)]
+colnames(DiemGKCK)[c(3:56)] <- c(1:54)
+
+#rename column
+GKCDR.colrename <-GKCDR
+CKCDR.colrename <-CKCDR
+colnames(GKCDR.colrename)[2:26] <- c(1:25)
+colnames(CKCDR.colrename)[2:30] <- c(26:54)
+
+
+MD1921.1921 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1921,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1921,-1])
+MD1921.1922 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1921,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1922,-1])
+MD1921.1923 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1921,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1923,-1])
+MD1921.1924 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1921,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1924,-1])
+MD1922.1921 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1922,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1921,-1])
+MD1922.1922 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1922,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1922,-1])
+MD1922.1923 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1922,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1923,-1])
+MD1922.1924 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1922,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1924,-1])
+MD1923.1921 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1923,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1921,-1])
+MD1923.1922 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1923,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1922,-1])
+MD1923.1923 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1923,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1923,-1])
+MD1923.1924 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1923,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1924,-1])
+MD1924.1921 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1924,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1921,-1])
+MD1924.1922 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1924,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1922,-1])
+MD1924.1923 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1924,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1923,-1])
+MD1924.1924 <- cbind(GKCDR.colrename[GKCDR.colrename[1] == 1924,-1],
+                     CKCDR.colrename[CKCDR.colrename[1] == 1924,-1])
+
+ncol(MD1924.1924)
+
+Diem1921.1921<-DiemGKCK[DiemGKCK[1] == 19211921,]
+Diem1921.1922<-DiemGKCK[DiemGKCK[1] == 19211922,]
+Diem1921.1923<-DiemGKCK[DiemGKCK[1] == 19211923,]
+Diem1921.1924<-DiemGKCK[DiemGKCK[1] == 19211924,]
+Diem1922.1921<-DiemGKCK[DiemGKCK[1] == 19221921,]
+Diem1922.1922<-DiemGKCK[DiemGKCK[1] == 19221922,]
+Diem1922.1923<-DiemGKCK[DiemGKCK[1] == 19221923,]
+Diem1922.1924<-DiemGKCK[DiemGKCK[1] == 19221924,]
+Diem1923.1921<-DiemGKCK[DiemGKCK[1] == 19231921,]
+Diem1923.1922<-DiemGKCK[DiemGKCK[1] == 19231922,]
+Diem1923.1923<-DiemGKCK[DiemGKCK[1] == 19231923,]
+Diem1923.1924<-DiemGKCK[DiemGKCK[1] == 19231924,]
+Diem1924.1921<-DiemGKCK[DiemGKCK[1] == 19241921,]
+Diem1924.1922<-DiemGKCK[DiemGKCK[1] == 19241922,]
+Diem1924.1923<-DiemGKCK[DiemGKCK[1] == 19241923,]
+Diem1924.1924<-DiemGKCK[DiemGKCK[1] == 19241924,]
+
+Diem1921.1921 <- apply(bind_rows(MD1921.1921,Diem1921.1921[,c(3:56)]),2,as.numeric)
+Diem1921.1922 <- apply(bind_rows(MD1921.1922,Diem1921.1922[,c(3:56)]),2,as.numeric)
+Diem1921.1923 <- apply(bind_rows(MD1921.1923,Diem1921.1923[,c(3:56)]),2,as.numeric)
+Diem1921.1924 <- apply(bind_rows(MD1921.1924,Diem1921.1924[,c(3:56)]),2,as.numeric)
+Diem1922.1921 <- apply(bind_rows(MD1922.1921,Diem1922.1921[,c(3:56)]),2,as.numeric)
+Diem1922.1922 <- apply(bind_rows(MD1922.1922,Diem1922.1922[,c(3:56)]),2,as.numeric)
+Diem1922.1923 <- apply(bind_rows(MD1922.1923,Diem1922.1923[,c(3:56)]),2,as.numeric)
+Diem1922.1924 <- apply(bind_rows(MD1922.1924,Diem1922.1924[,c(3:56)]),2,as.numeric)
+Diem1923.1921 <- apply(bind_rows(MD1923.1921,Diem1923.1921[,c(3:56)]),2,as.numeric)
+Diem1923.1922 <- apply(bind_rows(MD1923.1922,Diem1923.1922[,c(3:56)]),2,as.numeric)
+Diem1923.1923 <- apply(bind_rows(MD1923.1923,Diem1923.1923[,c(3:56)]),2,as.numeric)
+Diem1923.1924 <- apply(bind_rows(MD1923.1924,Diem1923.1924[,c(3:56)]),2,as.numeric)
+Diem1924.1921 <- apply(bind_rows(MD1924.1921,Diem1924.1921[,c(3:56)]),2,as.numeric)
+Diem1924.1922 <- apply(bind_rows(MD1924.1922,Diem1924.1922[,c(3:56)]),2,as.numeric)
+Diem1924.1923 <- apply(bind_rows(MD1924.1923,Diem1924.1923[,c(3:56)]),2,as.numeric)
+Diem1924.1924 <- apply(bind_rows(MD1924.1924,Diem1924.1924[,c(3:56)]),2,as.numeric)
+
+#last 5 students did midterm exam but did not do final exam 
+last5.1922 <- DiemGK[362:366,]
+last5.1923 <- DiemGK[362:366,]
+last5.1924 <- DiemGK[362:366,]
+last5.1922 <- last5.1922 %>% filter(MADE==1922) %>% select(X1:X25) %>% apply(2,as.numeric)
+last5.1923 <- last5.1923 %>% filter(MADE==1923) %>% select(X1:X25) %>% apply(2,as.numeric)
+last5.1924 <- last5.1924 %>% filter(MADE==1924) %>% select(X1:X25) %>% apply(2,as.numeric)
+
+last5.1922 <- as.data.frame(rbind(GKCDR.1922,last5.1922))
+last5.1923 <- as.data.frame(rbind(GKCDR.1923,last5.1923))
+last5.1924 <- as.data.frame(rbind(GKCDR.1924,last5.1924))
+
+
+#Learning outcome 12
+
+LO12.last5.1922 <- table(apply(last5.1922[-1,last5.1922[1,]==12],1,sum))
+LO12.last5.1923 <- table(apply(last5.1923[-1,last5.1923[1,]==12],1,sum))
+LO12.last5.1924 <- table(apply(last5.1924[-1,last5.1924[1,]==12],1,sum))
+
+rownames(LO12.last5.1922) <- abs(as.numeric(rownames(LO12.last5.1922)) - ncol(GKCDR[GKCDR[,1]==1922,GKCDR[2,] == 12]))
+rownames(LO12.last5.1923) <- abs(as.numeric(rownames(LO12.last5.1923)) - ncol(GKCDR[GKCDR[,1]==1923,GKCDR[2,] == 12]))
+rownames(LO12.last5.1924) <- abs(as.numeric(rownames(LO12.last5.1924)) - ncol(GKCDR[GKCDR[,1]==1924,GKCDR[2,] == 12]))
+
+
+LO12.Diem1921.1921 <- table(apply(Diem1921.1921[-1,Diem1921.1921[1,]==12],1,sum))
+LO12.Diem1921.1922 <- table(apply(Diem1921.1922[-1,Diem1921.1922[1,]==12],1,sum))
+LO12.Diem1921.1923 <- table(apply(Diem1921.1923[-1,Diem1921.1923[1,]==12],1,sum))
+LO12.Diem1921.1924 <- table(apply(Diem1921.1924[-1,Diem1921.1924[1,]==12],1,sum))
+LO12.Diem1922.1921 <- table(apply(Diem1922.1921[-1,Diem1922.1921[1,]==12],1,sum))
+LO12.Diem1922.1922 <- table(apply(Diem1922.1922[-1,Diem1922.1922[1,]==12],1,sum))
+LO12.Diem1922.1923 <- table(apply(Diem1922.1923[-1,Diem1922.1923[1,]==12],1,sum))
+LO12.Diem1922.1924 <- table(apply(Diem1922.1924[-1,Diem1922.1924[1,]==12],1,sum))
+LO12.Diem1923.1921 <- table(apply(Diem1923.1921[-1,Diem1923.1921[1,]==12],1,sum))
+LO12.Diem1923.1922 <- table(apply(Diem1923.1922[-1,Diem1923.1922[1,]==12],1,sum))
+LO12.Diem1923.1923 <- table(apply(Diem1923.1923[-1,Diem1923.1923[1,]==12],1,sum))
+LO12.Diem1923.1924 <- table(apply(Diem1923.1924[-1,Diem1923.1924[1,]==12],1,sum))
+LO12.Diem1924.1921 <- table(apply(Diem1924.1921[-1,Diem1924.1921[1,]==12],1,sum))
+LO12.Diem1924.1922 <- table(apply(Diem1924.1922[-1,Diem1924.1922[1,]==12],1,sum))
+LO12.Diem1924.1923 <- table(apply(Diem1924.1923[-1,Diem1924.1923[1,]==12],1,sum))
+LO12.Diem1924.1924 <- table(apply(Diem1924.1924[-1,Diem1924.1924[1,]==12],1,sum))
+
+#make count right answer -> wrong answer
+rownames(LO12.Diem1921.1921) <- abs(as.numeric(rownames(LO12.Diem1921.1921)) - ncol(MD1921.1921[,MD1921.1921[1,]==12]))
+rownames(LO12.Diem1921.1922) <- abs(as.numeric(rownames(LO12.Diem1921.1922)) - ncol(MD1921.1922[,MD1921.1922[1,]==12]))
+rownames(LO12.Diem1921.1923) <- abs(as.numeric(rownames(LO12.Diem1921.1923)) - ncol(MD1921.1923[,MD1921.1923[1,]==12]))
+rownames(LO12.Diem1921.1924) <- abs(as.numeric(rownames(LO12.Diem1921.1924)) - ncol(MD1921.1924[,MD1921.1924[1,]==12]))
+
+#different is here
+rownames(LO12.Diem1922.1921) <- abs(as.numeric(rownames(LO12.Diem1922.1921)) - ncol(MD1922.1921[,MD1922.1921[1,]==12]))
+rownames(LO12.Diem1922.1922) <- abs(as.numeric(rownames(LO12.Diem1922.1922)) - ncol(MD1922.1922[,MD1922.1922[1,]==12]))
+rownames(LO12.Diem1922.1923) <- abs(as.numeric(rownames(LO12.Diem1922.1923)) - ncol(MD1922.1923[,MD1922.1923[1,]==12]))
+rownames(LO12.Diem1922.1924) <- abs(as.numeric(rownames(LO12.Diem1922.1924)) - ncol(MD1922.1924[,MD1922.1924[1,]==12]))
+
+
+#-----------------
+
+rownames(LO12.Diem1923.1921) <- abs(as.numeric(rownames(LO12.Diem1923.1921)) - ncol(MD1923.1921[,MD1923.1921[1,]==12]))
+rownames(LO12.Diem1923.1922) <- abs(as.numeric(rownames(LO12.Diem1923.1922)) - ncol(MD1923.1922[,MD1923.1922[1,]==12]))
+rownames(LO12.Diem1923.1923) <- abs(as.numeric(rownames(LO12.Diem1923.1923)) - ncol(MD1923.1923[,MD1923.1923[1,]==12]))
+rownames(LO12.Diem1923.1924) <- abs(as.numeric(rownames(LO12.Diem1923.1924)) - ncol(MD1923.1924[,MD1923.1924[1,]==12]))
+rownames(LO12.Diem1924.1921) <- abs(as.numeric(rownames(LO12.Diem1924.1921)) - ncol(MD1924.1921[,MD1924.1921[1,]==12]))
+rownames(LO12.Diem1924.1922) <- abs(as.numeric(rownames(LO12.Diem1924.1922)) - ncol(MD1924.1922[,MD1924.1922[1,]==12]))
+rownames(LO12.Diem1924.1923) <- abs(as.numeric(rownames(LO12.Diem1924.1923)) - ncol(MD1924.1923[,MD1924.1923[1,]==12]))
+rownames(LO12.Diem1924.1924) <- abs(as.numeric(rownames(LO12.Diem1924.1924)) - ncol(MD1924.1924[,MD1924.1924[1,]==12]))
+
+
+
+
+LOW12 <- as.data.frame(bind_rows(LO12.Diem1921.1921,
+                                 LO12.Diem1921.1922,
+                                 LO12.Diem1921.1923,
+                                 LO12.Diem1921.1924,
+                                 LO12.Diem1922.1921,
+                                 LO12.Diem1922.1922,
+                                 LO12.Diem1922.1923,
+                                 LO12.Diem1922.1924,
+                                 LO12.Diem1923.1921,
+                                 LO12.Diem1923.1922,
+                                 LO12.Diem1923.1923,
+                                 LO12.Diem1923.1924,
+                                 LO12.Diem1924.1921,
+                                 LO12.Diem1924.1922,
+                                 LO12.Diem1924.1923,
+                                 LO12.Diem1924.1924,
+                                 LO12.last5.1922,
+                                 LO12.last5.1923,
+                                 LO12.last5.1924
+))
+
+LOW12[is.na(LOW12)] <- 0
+
+LOW12 <- as.data.frame(apply(LOW12,2,sum))
+LOW12$SoCauTLSai <- as.numeric(row.names(LOW12))
+
+LOW12$percent <- round(LOW12[,1]/sum(LOW12[,1]),3)
+
+#graph----
+
+GLOW12 <- ggplot(LOW12, aes(x = as.character(LOW12[,2]), y = LOW12[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW12[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 12", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+
+#Learning outcome 23
+
+#expected to be 1
+
+LO23.last5.1922 <- table(last5.1922[-1,last5.1922[1,]==23])
+#mini conclude: 1 question related to LO23 on Made1922 was answer by 1 student
+#and his/her answer was right -> LO23.last5.1922 = 0.(no need to add to combined)
+
+LO23.Diem1921.1921 <- table(apply(Diem1921.1921[-1,Diem1921.1921[1,]==23],1,sum))
+LO23.Diem1921.1922 <- table(apply(Diem1921.1922[-1,Diem1921.1922[1,]==23],1,sum))
+LO23.Diem1921.1923 <- table(apply(Diem1921.1923[-1,Diem1921.1923[1,]==23],1,sum))
+LO23.Diem1921.1924 <- table(apply(Diem1921.1924[-1,Diem1921.1924[1,]==23],1,sum))
+LO23.Diem1922.1921 <- table(apply(Diem1922.1921[-1,Diem1922.1921[1,]==23],1,sum))
+LO23.Diem1922.1922 <- table(apply(Diem1922.1922[-1,Diem1922.1922[1,]==23],1,sum))
+LO23.Diem1922.1923 <- table(apply(Diem1922.1923[-1,Diem1922.1923[1,]==23],1,sum))
+LO23.Diem1922.1924 <- table(apply(Diem1922.1924[-1,Diem1922.1924[1,]==23],1,sum))
+LO23.Diem1923.1921 <- table(apply(Diem1923.1921[-1,Diem1923.1921[1,]==23],1,sum))
+LO23.Diem1923.1922 <- table(apply(Diem1923.1922[-1,Diem1923.1922[1,]==23],1,sum))
+LO23.Diem1923.1923 <- table(apply(Diem1923.1923[-1,Diem1923.1923[1,]==23],1,sum))
+LO23.Diem1923.1924 <- table(apply(Diem1923.1924[-1,Diem1923.1924[1,]==23],1,sum))
+LO23.Diem1924.1921 <- table(apply(Diem1924.1921[-1,Diem1924.1921[1,]==23],1,sum))
+LO23.Diem1924.1922 <- table(apply(Diem1924.1922[-1,Diem1924.1922[1,]==23],1,sum))
+LO23.Diem1924.1923 <- table(apply(Diem1924.1923[-1,Diem1924.1923[1,]==23],1,sum))
+LO23.Diem1924.1924 <- table(apply(Diem1924.1924[-1,Diem1924.1924[1,]==23],1,sum))
+
+#make count right answer -> wrong answer
+rownames(LO23.Diem1921.1921) <- abs(as.numeric(rownames(LO23.Diem1921.1921)) - ncol(MD1921.1921[,MD1921.1921[1,]==23]))
+rownames(LO23.Diem1921.1922) <- abs(as.numeric(rownames(LO23.Diem1921.1922)) - ncol(MD1921.1922[,MD1921.1922[1,]==23]))
+rownames(LO23.Diem1921.1923) <- abs(as.numeric(rownames(LO23.Diem1921.1923)) - ncol(MD1921.1923[,MD1921.1923[1,]==23]))
+rownames(LO23.Diem1921.1924) <- abs(as.numeric(rownames(LO23.Diem1921.1924)) - ncol(MD1921.1924[,MD1921.1924[1,]==23]))
+
+#different is here
+rownames(LO23.Diem1922.1921) <- abs(as.numeric(rownames(LO23.Diem1922.1921)) - ncol(MD1922.1921[,MD1922.1921[1,]==23]))
+rownames(LO23.Diem1922.1922) <- abs(as.numeric(rownames(LO23.Diem1922.1922)) - ncol(MD1922.1922[,MD1922.1922[1,]==23]))
+rownames(LO23.Diem1922.1923) <- abs(as.numeric(rownames(LO23.Diem1922.1923)) - ncol(MD1922.1923[,MD1922.1923[1,]==23]))
+rownames(LO23.Diem1922.1924) <- abs(as.numeric(rownames(LO23.Diem1922.1924)) - ncol(MD1922.1924[,MD1922.1924[1,]==23]))
+
+
+#-----------------
+
+rownames(LO23.Diem1923.1921) <- abs(as.numeric(rownames(LO23.Diem1923.1921)) - ncol(MD1923.1921[,MD1923.1921[1,]==23]))
+rownames(LO23.Diem1923.1922) <- abs(as.numeric(rownames(LO23.Diem1923.1922)) - ncol(MD1923.1922[,MD1923.1922[1,]==23]))
+rownames(LO23.Diem1923.1923) <- abs(as.numeric(rownames(LO23.Diem1923.1923)) - ncol(MD1923.1923[,MD1923.1923[1,]==23]))
+rownames(LO23.Diem1923.1924) <- abs(as.numeric(rownames(LO23.Diem1923.1924)) - ncol(MD1923.1924[,MD1923.1924[1,]==23]))
+rownames(LO23.Diem1924.1921) <- abs(as.numeric(rownames(LO23.Diem1924.1921)) - ncol(MD1924.1921[,MD1924.1921[1,]==23]))
+rownames(LO23.Diem1924.1922) <- abs(as.numeric(rownames(LO23.Diem1924.1922)) - ncol(MD1924.1922[,MD1924.1922[1,]==23]))
+rownames(LO23.Diem1924.1923) <- abs(as.numeric(rownames(LO23.Diem1924.1923)) - ncol(MD1924.1923[,MD1924.1923[1,]==23]))
+rownames(LO23.Diem1924.1924) <- abs(as.numeric(rownames(LO23.Diem1924.1924)) - ncol(MD1924.1924[,MD1924.1924[1,]==23]))
+
+
+
+LOW23 <- as.data.frame(bind_rows(LO23.Diem1921.1921,
+                                 LO23.Diem1921.1922,
+                                 LO23.Diem1921.1923,
+                                 LO23.Diem1921.1924,
+                                 LO23.Diem1922.1921,
+                                 LO23.Diem1922.1922,
+                                 LO23.Diem1922.1923,
+                                 LO23.Diem1922.1924,
+                                 LO23.Diem1923.1921,
+                                 LO23.Diem1923.1922,
+                                 LO23.Diem1923.1923,
+                                 LO23.Diem1923.1924,
+                                 LO23.Diem1924.1921,
+                                 LO23.Diem1924.1922,
+                                 LO23.Diem1924.1923,
+                                 LO23.Diem1924.1924,
+
+                                 
+))
+
+LOW23[is.na(LOW23)] <- 0
+
+LOW23 <- as.data.frame(apply(LOW23,2,sum))
+LOW23$SoCauTLSai <- as.numeric(row.names(LOW23))
+
+LOW23$percent <- round(LOW23[,1]/sum(LOW23[,1]),3)
+#graph----
+GLOW23 <- ggplot(LOW23, aes(x = as.character(LOW23[,2]), y = LOW23[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW23[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 23", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+#Learning outcome 31
+
+LO31.last5.1922 <- table(apply(last5.1922[-1,last5.1922[1,]==31],1,sum))
+LO31.last5.1923 <- table(apply(last5.1923[-1,last5.1923[1,]==31],1,sum))
+LO31.last5.1924 <- table(apply(last5.1924[-1,last5.1924[1,]==31],1,sum))
+
+rownames(LO31.last5.1922) <- abs(as.numeric(rownames(LO31.last5.1922)) - ncol(GKCDR[GKCDR[,1]==1922,GKCDR[2,] == 31]))
+rownames(LO31.last5.1923) <- abs(as.numeric(rownames(LO31.last5.1923)) - ncol(GKCDR[GKCDR[,1]==1923,GKCDR[2,] == 31]))
+rownames(LO31.last5.1924) <- abs(as.numeric(rownames(LO31.last5.1924)) - ncol(GKCDR[GKCDR[,1]==1924,GKCDR[2,] == 31]))
+
+
+LO31.Diem1921.1921 <- table(apply(Diem1921.1921[-1,Diem1921.1921[1,]==31],1,sum))
+LO31.Diem1921.1922 <- table(apply(Diem1921.1922[-1,Diem1921.1922[1,]==31],1,sum))
+LO31.Diem1921.1923 <- table(apply(Diem1921.1923[-1,Diem1921.1923[1,]==31],1,sum))
+LO31.Diem1921.1924 <- table(apply(Diem1921.1924[-1,Diem1921.1924[1,]==31],1,sum))
+LO31.Diem1922.1921 <- table(apply(Diem1922.1921[-1,Diem1922.1921[1,]==31],1,sum))
+LO31.Diem1922.1922 <- table(apply(Diem1922.1922[-1,Diem1922.1922[1,]==31],1,sum))
+LO31.Diem1922.1923 <- table(apply(Diem1922.1923[-1,Diem1922.1923[1,]==31],1,sum))
+LO31.Diem1922.1924 <- table(apply(Diem1922.1924[-1,Diem1922.1924[1,]==31],1,sum))
+LO31.Diem1923.1921 <- table(apply(Diem1923.1921[-1,Diem1923.1921[1,]==31],1,sum))
+LO31.Diem1923.1922 <- table(apply(Diem1923.1922[-1,Diem1923.1922[1,]==31],1,sum))
+LO31.Diem1923.1923 <- table(apply(Diem1923.1923[-1,Diem1923.1923[1,]==31],1,sum))
+LO31.Diem1923.1924 <- table(apply(Diem1923.1924[-1,Diem1923.1924[1,]==31],1,sum))
+LO31.Diem1924.1921 <- table(apply(Diem1924.1921[-1,Diem1924.1921[1,]==31],1,sum))
+LO31.Diem1924.1922 <- table(apply(Diem1924.1922[-1,Diem1924.1922[1,]==31],1,sum))
+LO31.Diem1924.1923 <- table(apply(Diem1924.1923[-1,Diem1924.1923[1,]==31],1,sum))
+LO31.Diem1924.1924 <- table(apply(Diem1924.1924[-1,Diem1924.1924[1,]==31],1,sum))
+
+#make count right answer -> wrong answer
+rownames(LO31.Diem1921.1921) <- abs(as.numeric(rownames(LO31.Diem1921.1921)) - ncol(MD1921.1921[,MD1921.1921[1,]==31]))
+rownames(LO31.Diem1921.1922) <- abs(as.numeric(rownames(LO31.Diem1921.1922)) - ncol(MD1921.1922[,MD1921.1922[1,]==31]))
+rownames(LO31.Diem1921.1923) <- abs(as.numeric(rownames(LO31.Diem1921.1923)) - ncol(MD1921.1923[,MD1921.1923[1,]==31]))
+rownames(LO31.Diem1921.1924) <- abs(as.numeric(rownames(LO31.Diem1921.1924)) - ncol(MD1921.1924[,MD1921.1924[1,]==31]))
+
+rownames(LO31.Diem1922.1921) <- abs(as.numeric(rownames(LO31.Diem1922.1921)) - ncol(MD1922.1921[,MD1922.1921[1,]==31]))
+rownames(LO31.Diem1922.1922) <- abs(as.numeric(rownames(LO31.Diem1922.1922)) - ncol(MD1922.1922[,MD1922.1922[1,]==31]))
+rownames(LO31.Diem1922.1923) <- abs(as.numeric(rownames(LO31.Diem1922.1923)) - ncol(MD1922.1923[,MD1922.1923[1,]==31]))
+rownames(LO31.Diem1922.1924) <- abs(as.numeric(rownames(LO31.Diem1922.1924)) - ncol(MD1922.1924[,MD1922.1924[1,]==31]))
+
+
+#-----------------
+
+rownames(LO31.Diem1923.1921) <- abs(as.numeric(rownames(LO31.Diem1923.1921)) - ncol(MD1923.1921[,MD1923.1921[1,]==31]))
+rownames(LO31.Diem1923.1922) <- abs(as.numeric(rownames(LO31.Diem1923.1922)) - ncol(MD1923.1922[,MD1923.1922[1,]==31]))
+rownames(LO31.Diem1923.1923) <- abs(as.numeric(rownames(LO31.Diem1923.1923)) - ncol(MD1923.1923[,MD1923.1923[1,]==31]))
+rownames(LO31.Diem1923.1924) <- abs(as.numeric(rownames(LO31.Diem1923.1924)) - ncol(MD1923.1924[,MD1923.1924[1,]==31]))
+rownames(LO31.Diem1924.1921) <- abs(as.numeric(rownames(LO31.Diem1924.1921)) - ncol(MD1924.1921[,MD1924.1921[1,]==31]))
+rownames(LO31.Diem1924.1922) <- abs(as.numeric(rownames(LO31.Diem1924.1922)) - ncol(MD1924.1922[,MD1924.1922[1,]==31]))
+rownames(LO31.Diem1924.1923) <- abs(as.numeric(rownames(LO31.Diem1924.1923)) - ncol(MD1924.1923[,MD1924.1923[1,]==31]))
+rownames(LO31.Diem1924.1924) <- abs(as.numeric(rownames(LO31.Diem1924.1924)) - ncol(MD1924.1924[,MD1924.1924[1,]==31]))
+
+
+
+
+LOW31 <- as.data.frame(bind_rows(LO31.Diem1921.1921,
+                                 LO31.Diem1921.1922,
+                                 LO31.Diem1921.1923,
+                                 LO31.Diem1921.1924,
+                                 LO31.Diem1922.1921,
+                                 LO31.Diem1922.1922,
+                                 LO31.Diem1922.1923,
+                                 LO31.Diem1922.1924,
+                                 LO31.Diem1923.1921,
+                                 LO31.Diem1923.1922,
+                                 LO31.Diem1923.1923,
+                                 LO31.Diem1923.1924,
+                                 LO31.Diem1924.1921,
+                                 LO31.Diem1924.1922,
+                                 LO31.Diem1924.1923,
+                                 LO31.Diem1924.1924,
+                                 LO31.last5.1922,
+                                 LO31.last5.1923,
+                                 LO31.last5.1924
+))
+
+LOW31[is.na(LOW31)] <- 0
+
+LOW31 <- as.data.frame(apply(LOW31,2,sum))
+LOW31$SoCauTLSai <- as.numeric(row.names(LOW31))
+
+LOW31$percent <- round(LOW31[,1]/sum(LOW31[,1]),3)
+
+
+GLOW31 <- ggplot(LOW31, aes(x = as.character(LOW31[,2]), y = LOW31[,3])) + geom_bar(stat = "identity") + geom_text(aes(label=LOW31[,3]), vjust=-0.3, size=3.5, )+
+  labs(title = "Learning Outcome 31", x = "So cau tra loi sai", y = "tan suat tuong duong") + theme(panel.background = element_rect(fill = "#d557d5"))
+```
+
+```{r}
+#graph----
+GW <- ggarrange(GLOW.GK11, GLOW12, GLOW.GK21, GLOW.GK22, GLOW23, GLOW31, GLOW.CK32, ncol=2, nrow = 4)
+GW
+```
+
+Phan V
+```{r}
+# Cau VI.2
+# Gan p = 1
+p <- 1
+
+#reuse DiemGK & DiemCK
+DiemGKCK.2<- cbind( DiemGK[1:361,],DiemCK)
+
+#add combined made
+DiemGKCK.2$mdCK_GK <- as.numeric(paste(DiemGKCK.2[,29] ,DiemGKCK.2[,62], sep = ""))
+#rearrange
+DiemGKCK.2 <- DiemGKCK.2[,c(63,1:28, 33:61)]
+
+colnames(DiemGKCK.2)[c(5:29)] <- c(1:25)
+colnames(DiemGKCK.2)[c(30:58)] <- c(26:54)
+
+Diem2.1921.1921 <- apply(bind_rows(MD1921.1921,DiemGKCK.2[DiemGKCK.2[1] == 19211921,c(2,5:58)]),2,as.numeric)
+Diem2.1921.1922 <- apply(bind_rows(MD1921.1922,DiemGKCK.2[DiemGKCK.2[1] == 19211922,c(2,5:58)]),2,as.numeric)
+Diem2.1921.1923 <- apply(bind_rows(MD1921.1923,DiemGKCK.2[DiemGKCK.2[1] == 19211923,c(2,5:58)]),2,as.numeric)
+Diem2.1921.1924 <- apply(bind_rows(MD1921.1924,DiemGKCK.2[DiemGKCK.2[1] == 19211924,c(2,5:58)]),2,as.numeric)
+Diem2.1922.1921 <- apply(bind_rows(MD1922.1921,DiemGKCK.2[DiemGKCK.2[1] == 19221921,c(2,5:58)]),2,as.numeric)
+Diem2.1922.1922 <- apply(bind_rows(MD1922.1922,DiemGKCK.2[DiemGKCK.2[1] == 19221922,c(2,5:58)]),2,as.numeric)
+Diem2.1922.1923 <- apply(bind_rows(MD1922.1923,DiemGKCK.2[DiemGKCK.2[1] == 19221923,c(2,5:58)]),2,as.numeric)
+Diem2.1922.1924 <- apply(bind_rows(MD1922.1924,DiemGKCK.2[DiemGKCK.2[1] == 19221924,c(2,5:58)]),2,as.numeric)
+Diem2.1923.1921 <- apply(bind_rows(MD1923.1921,DiemGKCK.2[DiemGKCK.2[1] == 19231921,c(2,5:58)]),2,as.numeric)
+Diem2.1923.1922 <- apply(bind_rows(MD1923.1922,DiemGKCK.2[DiemGKCK.2[1] == 19231922,c(2,5:58)]),2,as.numeric)
+Diem2.1923.1923 <- apply(bind_rows(MD1923.1923,DiemGKCK.2[DiemGKCK.2[1] == 19231923,c(2,5:58)]),2,as.numeric)
+Diem2.1923.1924 <- apply(bind_rows(MD1923.1924,DiemGKCK.2[DiemGKCK.2[1] == 19231924,c(2,5:58)]),2,as.numeric)
+Diem2.1924.1921 <- apply(bind_rows(MD1924.1921,DiemGKCK.2[DiemGKCK.2[1] == 19241921,c(2,5:58)]),2,as.numeric)
+Diem2.1924.1922 <- apply(bind_rows(MD1924.1922,DiemGKCK.2[DiemGKCK.2[1] == 19241922,c(2,5:58)]),2,as.numeric)
+Diem2.1924.1923 <- apply(bind_rows(MD1924.1923,DiemGKCK.2[DiemGKCK.2[1] == 19241923,c(2,5:58)]),2,as.numeric)
+Diem2.1924.1924 <- apply(bind_rows(MD1924.1924,DiemGKCK.2[DiemGKCK.2[1] == 19241924,c(2,5:58)]),2,as.numeric)
+
+Diem2.LO12.1921.1921 <- as.data.frame(Diem2.1921.1921[,Diem2.1921.1921[1,] == 12 | is.na(Diem2.1921.1921[1,])]) 
+Diem2.LO12.1921.1922 <- as.data.frame(Diem2.1921.1922[,Diem2.1921.1922[1,] == 12 | is.na(Diem2.1921.1922[1,])]) 
+Diem2.LO12.1921.1923 <- as.data.frame(Diem2.1921.1923[,Diem2.1921.1923[1,] == 12 | is.na(Diem2.1921.1923[1,])]) 
+Diem2.LO12.1921.1924 <- as.data.frame(Diem2.1921.1924[,Diem2.1921.1924[1,] == 12 | is.na(Diem2.1921.1924[1,])]) 
+Diem2.LO12.1922.1921 <- as.data.frame(Diem2.1922.1921[,Diem2.1922.1921[1,] == 12 | is.na(Diem2.1922.1921[1,])]) 
+Diem2.LO12.1922.1922 <- as.data.frame(Diem2.1922.1922[,Diem2.1922.1922[1,] == 12 | is.na(Diem2.1922.1922[1,])]) 
+Diem2.LO12.1922.1923 <- as.data.frame(Diem2.1922.1923[,Diem2.1922.1923[1,] == 12 | is.na(Diem2.1922.1923[1,])]) 
+Diem2.LO12.1922.1924 <- as.data.frame(Diem2.1922.1924[,Diem2.1922.1924[1,] == 12 | is.na(Diem2.1922.1924[1,])]) 
+Diem2.LO12.1923.1921 <- as.data.frame(Diem2.1923.1921[,Diem2.1923.1921[1,] == 12 | is.na(Diem2.1923.1921[1,])]) 
+Diem2.LO12.1923.1922 <- as.data.frame(Diem2.1923.1922[,Diem2.1923.1922[1,] == 12 | is.na(Diem2.1923.1922[1,])]) 
+Diem2.LO12.1923.1923 <- as.data.frame(Diem2.1923.1923[,Diem2.1923.1923[1,] == 12 | is.na(Diem2.1923.1923[1,])]) 
+Diem2.LO12.1923.1924 <- as.data.frame(Diem2.1923.1924[,Diem2.1923.1924[1,] == 12 | is.na(Diem2.1923.1924[1,])]) 
+Diem2.LO12.1924.1921 <- as.data.frame(Diem2.1924.1921[,Diem2.1924.1921[1,] == 12 | is.na(Diem2.1924.1921[1,])]) 
+Diem2.LO12.1924.1922 <- as.data.frame(Diem2.1924.1922[,Diem2.1924.1922[1,] == 12 | is.na(Diem2.1924.1922[1,])]) 
+Diem2.LO12.1924.1923 <- as.data.frame(Diem2.1924.1923[,Diem2.1924.1923[1,] == 12 | is.na(Diem2.1924.1923[1,])]) 
+Diem2.LO12.1924.1924 <- as.data.frame(Diem2.1924.1924[,Diem2.1924.1924[1,] == 12 | is.na(Diem2.1924.1924[1,])]) 
+
+
+
+Diem2.LO12.1921.1921$TLD<- apply(Diem2.LO12.1921.1921[,c(1:ncol(MD1921.1921[,MD1921.1921 == 12]))],1,sum)
+Diem2.LO12.1921.1921[Diem2.LO12.1921.1921[-1,"TLD"] >= ncol(MD1921.1921[,MD1921.1921 == 12]) - p,"NO"]
+
+Diem2.LO12.1921.1921$TLD <- apply(Diem2.LO12.1921.1921[,c(1:ncol(MD1921.1921[,MD1921.1921 == 12]))],1,sum) 
+Diem2.LO12.1921.1922$TLD <- apply(Diem2.LO12.1921.1922[,c(1:ncol(MD1921.1922[,MD1921.1922 == 12]))],1,sum) 
+Diem2.LO12.1921.1923$TLD <- apply(Diem2.LO12.1921.1923[,c(1:ncol(MD1921.1923[,MD1921.1923 == 12]))],1,sum) 
+Diem2.LO12.1921.1924$TLD <- apply(Diem2.LO12.1921.1924[,c(1:ncol(MD1921.1924[,MD1921.1924 == 12]))],1,sum) 
+Diem2.LO12.1922.1921$TLD <- apply(Diem2.LO12.1922.1921[,c(1:ncol(MD1922.1921[,MD1922.1921 == 12]))],1,sum) 
+Diem2.LO12.1922.1922$TLD <- apply(Diem2.LO12.1922.1922[,c(1:ncol(MD1922.1922[,MD1922.1922 == 12]))],1,sum) 
+Diem2.LO12.1922.1923$TLD <- apply(Diem2.LO12.1922.1923[,c(1:ncol(MD1922.1923[,MD1922.1923 == 12]))],1,sum) 
+Diem2.LO12.1922.1924$TLD <- apply(Diem2.LO12.1922.1924[,c(1:ncol(MD1922.1924[,MD1922.1924 == 12]))],1,sum) 
+Diem2.LO12.1923.1921$TLD <- apply(Diem2.LO12.1923.1921[,c(1:ncol(MD1923.1921[,MD1923.1921 == 12]))],1,sum) 
+Diem2.LO12.1923.1922$TLD <- apply(Diem2.LO12.1923.1922[,c(1:ncol(MD1923.1922[,MD1923.1922 == 12]))],1,sum) 
+Diem2.LO12.1923.1923$TLD <- apply(Diem2.LO12.1923.1923[,c(1:ncol(MD1923.1923[,MD1923.1923 == 12]))],1,sum) 
+Diem2.LO12.1923.1924$TLD <- apply(Diem2.LO12.1923.1924[,c(1:ncol(MD1923.1924[,MD1923.1924 == 12]))],1,sum) 
+Diem2.LO12.1924.1921$TLD <- apply(Diem2.LO12.1924.1921[,c(1:ncol(MD1924.1921[,MD1924.1921 == 12]))],1,sum) 
+Diem2.LO12.1924.1922$TLD <- apply(Diem2.LO12.1924.1922[,c(1:ncol(MD1924.1922[,MD1924.1922 == 12]))],1,sum) 
+Diem2.LO12.1924.1923$TLD <- apply(Diem2.LO12.1924.1923[,c(1:ncol(MD1924.1923[,MD1924.1923 == 12]))],1,sum) 
+Diem2.LO12.1924.1924$TLD <- apply(Diem2.LO12.1924.1924[,c(1:ncol(MD1924.1924[,MD1924.1924 == 12]))],1,sum) 
+
+
+#list of student meets learning outcome 12 result requirement
+LO12SVList <- ("SV")
+
+LO12SVList <- c(LO12SVList,Diem2.LO12.1921.1921[Diem2.LO12.1921.1921[,"TLD"] >= ncol(MD1921.1921[,MD1921.1921 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1921.1922[Diem2.LO12.1921.1922[,"TLD"] >= ncol(MD1921.1922[,MD1921.1922 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1921.1923[Diem2.LO12.1921.1923[,"TLD"] >= ncol(MD1921.1923[,MD1921.1923 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1921.1924[Diem2.LO12.1921.1924[,"TLD"] >= ncol(MD1921.1924[,MD1921.1924 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1922.1921[Diem2.LO12.1922.1921[,"TLD"] >= ncol(MD1922.1921[,MD1922.1921 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1922.1922[Diem2.LO12.1922.1922[,"TLD"] >= ncol(MD1922.1922[,MD1922.1922 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1922.1923[Diem2.LO12.1922.1923[,"TLD"] >= ncol(MD1922.1923[,MD1922.1923 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1922.1924[Diem2.LO12.1922.1924[,"TLD"] >= ncol(MD1922.1924[,MD1922.1924 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1923.1921[Diem2.LO12.1923.1921[,"TLD"] >= ncol(MD1923.1921[,MD1923.1921 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1923.1922[Diem2.LO12.1923.1922[,"TLD"] >= ncol(MD1923.1922[,MD1923.1922 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1923.1923[Diem2.LO12.1923.1923[,"TLD"] >= ncol(MD1923.1923[,MD1923.1923 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1923.1924[Diem2.LO12.1923.1924[,"TLD"] >= ncol(MD1923.1924[,MD1923.1924 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1924.1921[Diem2.LO12.1924.1921[,"TLD"] >= ncol(MD1924.1921[,MD1924.1921 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1924.1922[Diem2.LO12.1924.1922[,"TLD"] >= ncol(MD1924.1922[,MD1924.1922 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1924.1923[Diem2.LO12.1924.1923[,"TLD"] >= ncol(MD1924.1923[,MD1924.1923 == 12]) - p,"No" ])  
+LO12SVList <- c(LO12SVList,Diem2.LO12.1924.1924[Diem2.LO12.1924.1924[,"TLD"] >= ncol(MD1924.1924[,MD1924.1924 == 12]) - p,"No" ])  
+
+
+
+
+#list of student meets learning outcome 12 result requirement
+LO12SVList
+na.omit(as.data.frame(LO12SVList))
+
+
+Diem2.LO31.1921.1921 <- as.data.frame(Diem2.1921.1921[,Diem2.1921.1921[1,] == 31 | is.na(Diem2.1921.1921[1,])]) 
+Diem2.LO31.1921.1922 <- as.data.frame(Diem2.1921.1922[,Diem2.1921.1922[1,] == 31 | is.na(Diem2.1921.1922[1,])]) 
+Diem2.LO31.1921.1923 <- as.data.frame(Diem2.1921.1923[,Diem2.1921.1923[1,] == 31 | is.na(Diem2.1921.1923[1,])]) 
+Diem2.LO31.1921.1924 <- as.data.frame(Diem2.1921.1924[,Diem2.1921.1924[1,] == 31 | is.na(Diem2.1921.1924[1,])]) 
+Diem2.LO31.1922.1921 <- as.data.frame(Diem2.1922.1921[,Diem2.1922.1921[1,] == 31 | is.na(Diem2.1922.1921[1,])]) 
+Diem2.LO31.1922.1922 <- as.data.frame(Diem2.1922.1922[,Diem2.1922.1922[1,] == 31 | is.na(Diem2.1922.1922[1,])]) 
+Diem2.LO31.1922.1923 <- as.data.frame(Diem2.1922.1923[,Diem2.1922.1923[1,] == 31 | is.na(Diem2.1922.1923[1,])]) 
+Diem2.LO31.1922.1924 <- as.data.frame(Diem2.1922.1924[,Diem2.1922.1924[1,] == 31 | is.na(Diem2.1922.1924[1,])]) 
+Diem2.LO31.1923.1921 <- as.data.frame(Diem2.1923.1921[,Diem2.1923.1921[1,] == 31 | is.na(Diem2.1923.1921[1,])]) 
+Diem2.LO31.1923.1922 <- as.data.frame(Diem2.1923.1922[,Diem2.1923.1922[1,] == 31 | is.na(Diem2.1923.1922[1,])]) 
+Diem2.LO31.1923.1923 <- as.data.frame(Diem2.1923.1923[,Diem2.1923.1923[1,] == 31 | is.na(Diem2.1923.1923[1,])]) 
+Diem2.LO31.1923.1924 <- as.data.frame(Diem2.1923.1924[,Diem2.1923.1924[1,] == 31 | is.na(Diem2.1923.1924[1,])]) 
+Diem2.LO31.1924.1921 <- as.data.frame(Diem2.1924.1921[,Diem2.1924.1921[1,] == 31 | is.na(Diem2.1924.1921[1,])]) 
+Diem2.LO31.1924.1922 <- as.data.frame(Diem2.1924.1922[,Diem2.1924.1922[1,] == 31 | is.na(Diem2.1924.1922[1,])]) 
+Diem2.LO31.1924.1923 <- as.data.frame(Diem2.1924.1923[,Diem2.1924.1923[1,] == 31 | is.na(Diem2.1924.1923[1,])]) 
+Diem2.LO31.1924.1924 <- as.data.frame(Diem2.1924.1924[,Diem2.1924.1924[1,] == 31 | is.na(Diem2.1924.1924[1,])]) 
+
+
+
+Diem2.LO31.1921.1921$TLD<- apply(Diem2.LO31.1921.1921[,c(1:ncol(MD1921.1921[,MD1921.1921 == 31]))],1,sum)
+Diem2.LO31.1921.1921[Diem2.LO31.1921.1921[-1,"TLD"] >= ncol(MD1921.1921[,MD1921.1921 == 31]) - p,"NO"]
+
+Diem2.LO31.1921.1921$TLD <- apply(Diem2.LO31.1921.1921[,c(1:ncol(MD1921.1921[,MD1921.1921 == 31]))],1,sum) 
+Diem2.LO31.1921.1922$TLD <- apply(Diem2.LO31.1921.1922[,c(1:ncol(MD1921.1922[,MD1921.1922 == 31]))],1,sum) 
+Diem2.LO31.1921.1923$TLD <- apply(Diem2.LO31.1921.1923[,c(1:ncol(MD1921.1923[,MD1921.1923 == 31]))],1,sum) 
+Diem2.LO31.1921.1924$TLD <- apply(Diem2.LO31.1921.1924[,c(1:ncol(MD1921.1924[,MD1921.1924 == 31]))],1,sum) 
+Diem2.LO31.1922.1921$TLD <- apply(Diem2.LO31.1922.1921[,c(1:ncol(MD1922.1921[,MD1922.1921 == 31]))],1,sum) 
+Diem2.LO31.1922.1922$TLD <- apply(Diem2.LO31.1922.1922[,c(1:ncol(MD1922.1922[,MD1922.1922 == 31]))],1,sum) 
+Diem2.LO31.1922.1923$TLD <- apply(Diem2.LO31.1922.1923[,c(1:ncol(MD1922.1923[,MD1922.1923 == 31]))],1,sum) 
+Diem2.LO31.1922.1924$TLD <- apply(Diem2.LO31.1922.1924[,c(1:ncol(MD1922.1924[,MD1922.1924 == 31]))],1,sum) 
+Diem2.LO31.1923.1921$TLD <- apply(Diem2.LO31.1923.1921[,c(1:ncol(MD1923.1921[,MD1923.1921 == 31]))],1,sum) 
+Diem2.LO31.1923.1922$TLD <- apply(Diem2.LO31.1923.1922[,c(1:ncol(MD1923.1922[,MD1923.1922 == 31]))],1,sum) 
+Diem2.LO31.1923.1923$TLD <- apply(Diem2.LO31.1923.1923[,c(1:ncol(MD1923.1923[,MD1923.1923 == 31]))],1,sum) 
+Diem2.LO31.1923.1924$TLD <- apply(Diem2.LO31.1923.1924[,c(1:ncol(MD1923.1924[,MD1923.1924 == 31]))],1,sum) 
+Diem2.LO31.1924.1921$TLD <- apply(Diem2.LO31.1924.1921[,c(1:ncol(MD1924.1921[,MD1924.1921 == 31]))],1,sum) 
+Diem2.LO31.1924.1922$TLD <- apply(Diem2.LO31.1924.1922[,c(1:ncol(MD1924.1922[,MD1924.1922 == 31]))],1,sum) 
+Diem2.LO31.1924.1923$TLD <- apply(Diem2.LO31.1924.1923[,c(1:ncol(MD1924.1923[,MD1924.1923 == 31]))],1,sum) 
+Diem2.LO31.1924.1924$TLD <- apply(Diem2.LO31.1924.1924[,c(1:ncol(MD1924.1924[,MD1924.1924 == 31]))],1,sum) 
+
+
+#list of student meets learning outcome 31 result requirement
+LO31SVList <- "SV"
+
+LO31SVList <- c(LO31SVList,Diem2.LO31.1921.1921[Diem2.LO31.1921.1921[,"TLD"] >= ncol(MD1921.1921[,MD1921.1921 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1921.1922[Diem2.LO31.1921.1922[,"TLD"] >= ncol(MD1921.1922[,MD1921.1922 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1921.1923[Diem2.LO31.1921.1923[,"TLD"] >= ncol(MD1921.1923[,MD1921.1923 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1921.1924[Diem2.LO31.1921.1924[,"TLD"] >= ncol(MD1921.1924[,MD1921.1924 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1922.1921[Diem2.LO31.1922.1921[,"TLD"] >= ncol(MD1922.1921[,MD1922.1921 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1922.1922[Diem2.LO31.1922.1922[,"TLD"] >= ncol(MD1922.1922[,MD1922.1922 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1922.1923[Diem2.LO31.1922.1923[,"TLD"] >= ncol(MD1922.1923[,MD1922.1923 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1922.1924[Diem2.LO31.1922.1924[,"TLD"] >= ncol(MD1922.1924[,MD1922.1924 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1923.1921[Diem2.LO31.1923.1921[,"TLD"] >= ncol(MD1923.1921[,MD1923.1921 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1923.1922[Diem2.LO31.1923.1922[,"TLD"] >= ncol(MD1923.1922[,MD1923.1922 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1923.1923[Diem2.LO31.1923.1923[,"TLD"] >= ncol(MD1923.1923[,MD1923.1923 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1923.1924[Diem2.LO31.1923.1924[,"TLD"] >= ncol(MD1923.1924[,MD1923.1924 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1924.1921[Diem2.LO31.1924.1921[,"TLD"] >= ncol(MD1924.1921[,MD1924.1921 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1924.1922[Diem2.LO31.1924.1922[,"TLD"] >= ncol(MD1924.1922[,MD1924.1922 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1924.1923[Diem2.LO31.1924.1923[,"TLD"] >= ncol(MD1924.1923[,MD1924.1923 == 31]) - p,"No" ])  
+LO31SVList <- c(LO31SVList,Diem2.LO31.1924.1924[Diem2.LO31.1924.1924[,"TLD"] >= ncol(MD1924.1924[,MD1924.1924 == 31]) - p,"No" ])  
+
+
+#list of student meets learning outcome 31 result requirement
+LO31SVList
+na.omit(as.data.frame(LO31SVList))
+
+
+
+#Learning outcome 23 handling exception data of midterm MD1922
+#Learning outcome 23 only have 1 question in midterm (MD1922) and 2 in final
+TotalQFrameGKEX
+#majority of students have right answer for Lo23MD1922 midterm
+DiemGK.1922.LO23
+#No student have 3 right answer for total Learning outcome 23(mid/final).
+LOW23
+```
+
+```{r}
+# Cau VI.3
+# IDK
+# 
+GKMN<- DiemGKCK.2[,c(3,5:29)]
+Nhom1<-GKMN[GKMN[,1] == "L01",]
+Nhom2<-GKMN[GKMN[,1] == "L02",]
+Nhom3<-GKMN[GKMN[,1] == "L03",]
+Nhom1$TongDiem <-round(rowSums(apply(Nhom1[,c(2:26)],2,as.numeric))/25*10,1)
+#average of each Nhom
+mean(round(rowSums(apply(Nhom1[,c(2:26)],2,as.numeric))/25*10,1))
+mean(round(rowSums(apply(Nhom2[,c(2:26)],2,as.numeric))/25*10,1))
+mean(round(rowSums(apply(Nhom3[,c(2:26)],2,as.numeric))/25*10,1))
+#median of each Nhom
+median(round(rowSums(apply(Nhom1[,c(2:26)],2,as.numeric))/25*10,1))
+median(round(rowSums(apply(Nhom2[,c(2:26)],2,as.numeric))/25*10,1))
+median(round(rowSums(apply(Nhom3[,c(2:26)],2,as.numeric))/25*10,1))
+
+#Frequency of each Nhom according to Diem
+
+FNhom1 <-as.data.frame(table(round(rowSums(apply(Nhom1[,c(2:26)],2,as.numeric))/25*10,1)))
+colnames(FNhom1) <- c("Diem", "Percentage")
+FNhom1$Percentage <- round(FNhom1$Percentage/sum(FNhom1$Percentage)*100,2)
+
+FNhom2 <-as.data.frame(table(round(rowSums(apply(Nhom2[,c(2:26)],2,as.numeric))/25*10,1)))
+colnames(FNhom2) <- c("Diem", "Percentage")
+FNhom2$Percentage <- round(FNhom2$Percentage/sum(FNhom2$Percentage)*100,2)
+
+FNhom3 <-as.data.frame(table(round(rowSums(apply(Nhom3[,c(2:26)],2,as.numeric))/25*10,1)))
+colnames(FNhom3) <- c("Diem", "Percentage")
+FNhom3$Percentage <- round(FNhom3$Percentage/sum(FNhom3$Percentage)*100,2)
+
+GNhom1 <- ggplot(FNhom1, aes(x = as.character(FNhom1[,1]), y = FNhom1[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=FNhom1[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Nhom 1", x = "Diem", y = "%SV cua nhom") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GNhom2 <- ggplot(FNhom2, aes(x = as.character(FNhom2[,1]), y = FNhom2[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=FNhom2[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Nhom 2", x = "Diem", y = "%SV cua nhom") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GNhom3 <- ggplot(FNhom3, aes(x = as.character(FNhom3[,1]), y = FNhom3[,2])) + geom_bar(stat = "identity") + geom_text(aes(label=FNhom3[,2]), vjust=-0.3, size=3.5, )+
+  labs(title = "Nhom 3", x = "Diem", y = "%SV cua nhom") + theme(panel.background = element_rect(fill = "#d557d5"))
+
+GNhom <- ggarrange(GNhom1,GNhom2,GNhom3, ncol = 3)
+
+GNhom
+
+#conclusion: 
+#Nhom3 has high grade with highest average grade
+#Nhom1 has low grade with lowest average grade
+#Nhom2 has average grade slightly lower than Nhom3
+```
+

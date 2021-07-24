@@ -215,7 +215,9 @@ LOW23
 #Problem 3------------------------
 # IDK
 # 
-GKMN<- DiemGKCK.2[,c(3,5:29)]
+
+GKMN<- DiemGK[,c(2,4:28)]
+
 Nhom1<-GKMN[GKMN[,1] == "L01",]
 Nhom2<-GKMN[GKMN[,1] == "L02",]
 Nhom3<-GKMN[GKMN[,1] == "L03",]

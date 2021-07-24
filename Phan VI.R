@@ -462,6 +462,7 @@ DiemCK.Chapter.1922 <- DiemCK.1922
 DiemCK.Chapter.1923 <- DiemCK.1923
 DiemCK.Chapter.1924 <- DiemCK.1924
 
+#rename column question number into chapter-question number-made
 
 colnames(DiemGK.Chapter.1921) <- paste("Ch",GKChapter[GKChapter[,1]==1921,-1],"-Q",c(1:25), "-De21", sep  = "")
 colnames(DiemGK.Chapter.1922) <- paste("Ch",GKChapter[GKChapter[,1]==1922,-1],"-Q",c(1:25), "-De22", sep  = "")
@@ -474,6 +475,8 @@ colnames(DiemCK.Chapter.1923) <- paste("Ch",CKChapter[CKChapter[,1]==1923,-1],"-
 colnames(DiemCK.Chapter.1924) <- paste("Ch",CKChapter[CKChapter[,1]==1924,-1],"-Q",c(1:25), "-De24", sep  = "")
 
 
+#mutate data frame into sum of each row and 
+#get its percentage based on number of questions per exam
 
 DiemGK.Chapter.1921 <-round(colSums(apply(DiemGK.Chapter.1921[-1,],2,as.numeric))/nrow(DiemGK.1921)*100,1)
 DiemGK.Chapter.1922 <-round(colSums(apply(DiemGK.Chapter.1922[-1,],2,as.numeric))/nrow(DiemGK.1922)*100,1)
